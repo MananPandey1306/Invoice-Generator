@@ -52,20 +52,44 @@ async function generatePDF(element, invoice) {
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const A4_W = 210;  // mm
   const A4_H = 297;  // mm
-  const MARGIN = 0;  // no margin  we control content sizing
 
-  const imgData   = canvas.toDataURL('image/jpeg', 0.92);
-  const contentH  = (canvas.height / canvas.width) * A4_W;
+  const imgData  = canvas.toDataURL('image/jpeg', 0.92);
+  // How many mm does one canvas-pixel represent in width?
+  const mmPerPx  = A4_W / canvas.width;
+  const totalH   = canvas.height * mmPerPx; // total height in mm
 
-  if (contentH <= A4_H) {
-    // Fits naturally
-    pdf.addImage(imgData, 'JPEG', MARGIN, MARGIN, A4_W - MARGIN * 2, contentH);
+  if (totalH <= A4_H) {
+    // Content fits on one page — render normally, no scaling
+    pdf.addImage(imgData, 'JPEG', 0, 0, A4_W, totalH);
   } else {
-    // Scale to fit one page
-    const scale    = A4_H / contentH;
-    const scaledW  = (A4_W - MARGIN * 2) * scale;
-    const xOffset  = (A4_W - scaledW) / 2;
-    pdf.addImage(imgData, 'JPEG', xOffset, MARGIN, scaledW, A4_H - MARGIN * 2);
+    // Split into multiple pages
+    let yMm = 0;  // how far down the content we've rendered (mm)
+    let pageIndex = 0;
+    while (yMm < totalH) {
+      if (pageIndex > 0) pdf.addPage();
+
+      // Slice height in pixels for this page
+      const startPx = Math.round(yMm / mmPerPx);
+      const sliceHPx = Math.min(
+        Math.round(A4_H / mmPerPx),
+        canvas.height - startPx
+      );
+
+      // Draw the slice onto an offscreen canvas
+      const sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width  = canvas.width;
+      sliceCanvas.height = sliceHPx;
+      sliceCanvas.getContext('2d').drawImage(
+        canvas, 0, startPx, canvas.width, sliceHPx,
+        0, 0, canvas.width, sliceHPx
+      );
+
+      const sliceH = sliceHPx * mmPerPx;
+      pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, A4_W, sliceH);
+
+      yMm += A4_H;
+      pageIndex++;
+    }
   }
 
   const label    = invoice.isEstimate ? 'Estimate' : 'Invoice';
