@@ -1,4 +1,4 @@
-// ─── Number to Words (Indian) ─────────────────────────────────────────────────
+//  Number to Words (Indian) 
 
 const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
   'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen',
@@ -43,7 +43,7 @@ export function amountToWords(amount) {
   return result + ' Only';
 }
 
-// ─── Currency Format ──────────────────────────────────────────────────────────
+//  Currency Format 
 
 export function formatINR(amount) {
   return new Intl.NumberFormat('en-IN', {
@@ -51,7 +51,7 @@ export function formatINR(amount) {
   }).format(amount || 0);
 }
 
-// ─── Item Calculation ─────────────────────────────────────────────────────────
+//  Item Calculation 
 
 export function calcItemAmount(item) {
   const qty = parseFloat(item.qty) || 0;
@@ -72,7 +72,7 @@ export function calcItemAmount(item) {
   };
 }
 
-// ─── Invoice Totals ───────────────────────────────────────────────────────────
+//  Invoice Totals 
 
 export function calcTotals(items) {
   let subtotal = 0, totalDisc = 0, totalGST = 0;
@@ -86,7 +86,7 @@ export function calcTotals(items) {
   return { subtotal, totalDisc, totalGST, grand };
 }
 
-// ─── LocalStorage helpers ─────────────────────────────────────────────────────
+//  LocalStorage helpers 
 
 export function loadLS(key, fallback) {
   try {
@@ -99,13 +99,13 @@ export function saveLS(key, value) {
   try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
 }
 
-// ─── ID Generator ────────────────────────────────────────────────────────────
+//  ID Generator 
 
 export function uid() {
   return Math.random().toString(36).slice(2, 9);
 }
 
-// ─── Default Item ─────────────────────────────────────────────────────────────
+//  Default Item 
 
 export function defaultItem() {
   return {
@@ -119,7 +119,7 @@ export function defaultItem() {
   };
 }
 
-// ─── Default Invoice State ─────────────────────────────────────────────────────
+//  Default Invoice State 
 
 export function defaultInvoice(num) {
   const today = new Date();

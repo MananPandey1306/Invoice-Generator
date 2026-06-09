@@ -9,7 +9,7 @@ const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'box', 'bag', 'roll', 'pair', 's
 const GST_OPTIONS = ['0', '5', '12', '18', '28'];
 const PAYMENT_MODES = ['Cash', 'UPI', 'Card', 'Credit'];
 
-// ─── Phone helpers ─────────────────────────────────────────────────────────────
+//  Phone helpers 
 function cleanPhone(raw) {
   if (!raw) return null;
   let d = raw.replace(/\D/g, '');
@@ -20,7 +20,7 @@ function cleanPhone(raw) {
   return d;
 }
 
-// ─── WhatsApp message builder ──────────────────────────────────────────────────
+//  WhatsApp message builder 
 function buildWhatsAppMsg(biz, invoice) {
   const isEst = invoice.isEstimate;
   const label = isEst ? 'Estimate' : 'Invoice';
@@ -29,13 +29,13 @@ function buildWhatsAppMsg(biz, invoice) {
     .filter(i => i.name)
     .map((i, idx) => {
       const c = calcItemAmount(i);
-      return `  ${idx + 1}. ${i.name} × ${i.qty} ${i.unit}  →  ₹${c.total.toFixed(2)}`;
+      return `  ${idx + 1}. ${i.name}  ${i.qty} ${i.unit}    ${c.total.toFixed(2)}`;
     }).join('\n');
 
-  return `Hello ${invoice.customerName || 'Sir/Madam'} 👋\n\nHere are your *${label}* details from *${biz.name || 'Our Store'}*:\n\n📄 *${label} No:* ${invoice.invoiceNumber}\n📅 *Date:* ${invoice.invoiceDate}${invoice.dueDate ? `\n⏳ *Due:* ${invoice.dueDate}` : ''}\n\n*Items:*\n${itemLines || '  (no items)'}\n\n💰 *Grand Total: ₹${grand.toFixed(2)}*\n${amountToWords(grand)}\n\n💳 *Payment:* ${invoice.paymentMode}${invoice.notes ? `\n\n📌 _${invoice.notes}_` : ''}\n\nThank you for your business! 🙏${biz.phone ? `\n📞 ${biz.phone}` : ''}${biz.email ? `\n✉ ${biz.email}` : ''}`.trim();
+  return `Hello ${invoice.customerName || 'Sir/Madam'} \n\nHere are your *${label}* details from *${biz.name || 'Our Store'}*:\n\n *${label} No:* ${invoice.invoiceNumber}\n *Date:* ${invoice.invoiceDate}${invoice.dueDate ? `\n *Due:* ${invoice.dueDate}` : ''}\n\n*Items:*\n${itemLines || '  (no items)'}\n\n *Grand Total: ${grand.toFixed(2)}*\n${amountToWords(grand)}\n\n *Payment:* ${invoice.paymentMode}${invoice.notes ? `\n\n _${invoice.notes}_` : ''}\n\nThank you for your business! ${biz.phone ? `\n ${biz.phone}` : ''}${biz.email ? `\n ${biz.email}` : ''}`.trim();
 }
 
-// ─── PDF generator using html2canvas + jsPDF ──────────────────────────────────
+//  PDF generator using html2canvas + jsPDF 
 async function generatePDF(element, invoice) {
   const { default: html2canvas } = await import('html2canvas');
   const { jsPDF } = await import('jspdf');
@@ -51,7 +51,7 @@ async function generatePDF(element, invoice) {
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const A4_W = 210;  // mm
   const A4_H = 297;  // mm
-  const MARGIN = 0;  // no margin — we control content sizing
+  const MARGIN = 0;  // no margin  we control content sizing
 
   const imgData   = canvas.toDataURL('image/jpeg', 0.92);
   const contentH  = (canvas.height / canvas.width) * A4_W;
@@ -72,13 +72,13 @@ async function generatePDF(element, invoice) {
   return { pdf, blob: pdf.output('blob'), filename };
 }
 
-// ─── Toast ─────────────────────────────────────────────────────────────────────
+//  Toast 
 function Toast({ msg, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 2500); return () => clearTimeout(t); }, []);
-  return <div className="save-toast">✅ {msg}</div>;
+  return <div className="save-toast"> {msg}</div>;
 }
 
-// ─── WhatsApp Send Modal ───────────────────────────────────────────────────────
+//  WhatsApp Send Modal 
 function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
   const [phone,  setPhone]  = useState(invoice.customerPhone || '');
   const [step,   setStep]   = useState('form'); // form | generating | done | error
@@ -93,7 +93,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
       const { pdf, blob, filename } = await generatePDF(el, invoice);
       const file = new File([blob], filename, { type: 'application/pdf' });
 
-      // ── Mobile: Web Share API (can share file directly to WhatsApp app) ──
+      //  Mobile: Web Share API (can share file directly to WhatsApp app) 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -104,7 +104,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
         return;
       }
 
-      // ── Desktop: auto-download PDF + open WhatsApp web ──
+      //  Desktop: auto-download PDF + open WhatsApp web 
       const url = URL.createObjectURL(blob);
       const a   = document.createElement('a');
       a.href = url; a.download = filename;
@@ -136,17 +136,17 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
         {/* Header */}
         <div className="wa-modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 28 }}>📲</span>
+            <span style={{ fontSize: 28 }}></span>
             <div>
               <div className="wa-modal-title">Send via WhatsApp</div>
               <div className="wa-modal-sub">
                 {isMobileShare
                   ? 'PDF will be shared directly to WhatsApp'
-                  : 'PDF will download → attach it in WhatsApp'}
+                  : 'PDF will download  attach it in WhatsApp'}
               </div>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className="modal-close" onClick={onClose}></button>
         </div>
 
         {/* Body */}
@@ -158,7 +158,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
                 WhatsApp Number
                 {phone && (
                   <span className={`wa-status ${num ? 'detected' : 'missing'}`} style={{ marginLeft: 8 }}>
-                    {num ? '✓ Valid' : '⚠ Invalid'}
+                    {num ? ' Valid' : ' Invalid'}
                   </span>
                 )}
               </label>
@@ -188,14 +188,14 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
                 </div>
                 <div className="wa-step">
                   <span className="wa-step-num">3</span>
-                  <span>Click the <strong>📎 attachment icon</strong> in WhatsApp and attach the downloaded PDF</span>
+                  <span>Click the <strong> attachment icon</strong> in WhatsApp and attach the downloaded PDF</span>
                 </div>
               </div>
             )}
 
             {isMobileShare && (
               <div className="wa-info">
-                📱 Your device supports direct sharing — the PDF will be attached automatically when you select WhatsApp!
+                 Your device supports direct sharing  the PDF will be attached automatically when you select WhatsApp!
               </div>
             )}
           </>)}
@@ -203,13 +203,13 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
           {step === 'generating' && (
             <div className="wa-loading">
               <div className="wa-spinner" />
-              <div>Generating A4 PDF… please wait</div>
+              <div>Generating A4 PDF please wait</div>
             </div>
           )}
 
           {step === 'done' && (
             <div className="wa-done">
-              <div style={{ fontSize: 40 }}>✅</div>
+              <div style={{ fontSize: 40 }}></div>
               <div className="wa-done-text">
                 {isMobileShare
                   ? 'Shared successfully!'
@@ -220,7 +220,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
 
           {step === 'error' && (
             <div className="wa-done" style={{ color: '#f87171' }}>
-              <div style={{ fontSize: 36 }}>❌</div>
+              <div style={{ fontSize: 36 }}></div>
               <div style={{ fontWeight: 600 }}>Could not generate PDF</div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>{errMsg}</div>
             </div>
@@ -231,7 +231,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
         <div className="wa-modal-footer">
           {step === 'form' && (
             <button id="wa-send-btn" className="btn btn-whatsapp btn-lg" onClick={handleSend}>
-              📲 {isMobileShare ? 'Share PDF on WhatsApp' : 'Download PDF & Open WhatsApp'}
+               {isMobileShare ? 'Share PDF on WhatsApp' : 'Download PDF & Open WhatsApp'}
             </button>
           )}
           {step === 'done' && (
@@ -250,7 +250,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
   );
 }
 
-// ─── Business Setup Panel ──────────────────────────────────────────────────────
+//  Business Setup Panel 
 function BusinessPanel({ biz, onChange }) {
   const fileRef = useRef();
   function handleLogo(e) {
@@ -261,7 +261,7 @@ function BusinessPanel({ biz, onChange }) {
   }
   return (
     <div className="section-card">
-      <div className="section-title"><div className="section-title-icon">🏪</div>Business Profile</div>
+      <div className="section-title"><div className="section-title-icon"></div>Business Profile</div>
       <div style={{ display: 'flex', gap: 14, marginBottom: 14, alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '0 0 auto' }}>
           <label style={{ marginBottom: 6, display: 'block' }}>Logo</label>
@@ -269,7 +269,7 @@ function BusinessPanel({ biz, onChange }) {
             <input id="logo-upload" type="file" accept="image/*" ref={fileRef} onChange={handleLogo} />
             {biz.logo
               ? <img src={biz.logo} alt="logo" className="logo-preview" style={{ height: 54, width: '100%' }} />
-              : <><div style={{ fontSize: 22 }}>🖼️</div><div className="logo-upload-text">Upload</div></>
+              : <><div style={{ fontSize: 22 }}></div><div className="logo-upload-text">Upload</div></>
             }
           </div>
           {biz.logo && (
@@ -314,19 +314,19 @@ function BusinessPanel({ biz, onChange }) {
   );
 }
 
-// ─── Customer & Invoice Details ────────────────────────────────────────────────
+//  Customer & Invoice Details 
 function CustomerPanel({ invoice, onChange }) {
   const isEst = invoice.isEstimate;
   const num   = cleanPhone(invoice.customerPhone);
   return (
     <div className="section-card">
-      <div className="section-title"><div className="section-title-icon">👤</div>Customer &amp; Invoice Details</div>
+      <div className="section-title"><div className="section-title-icon"></div>Customer &amp; Invoice Details</div>
 
       {/* Estimate toggle */}
       <div className={`estimate-banner${isEst ? ' active' : ''}`}>
         <div style={{ flex: 1 }}>
           <div className="estimate-banner-label">
-            {isEst ? '📋 Estimate Mode — stamp will appear on document' : '🧾 Invoice Mode'}
+            {isEst ? ' Estimate Mode  stamp will appear on document' : ' Invoice Mode'}
           </div>
           <div className="estimate-banner-sub">
             {isEst ? 'Prints as ESTIMATE with red watermark.' : 'Toggle to create an estimate instead.'}
@@ -366,7 +366,7 @@ function CustomerPanel({ invoice, onChange }) {
             Customer Phone
             {invoice.customerPhone && (
               <span className={`wa-status ${num ? 'detected' : 'missing'}`} style={{ marginLeft: 8 }}>
-                {num ? '📲 WhatsApp OK' : '⚠ Invalid'}
+                {num ? ' WhatsApp OK' : ' Invalid'}
               </span>
             )}
           </label>
@@ -388,7 +388,7 @@ function CustomerPanel({ invoice, onChange }) {
   );
 }
 
-// ─── Item Row ──────────────────────────────────────────────────────────────────
+//  Item Row 
 function ItemRow({ item, onChange, onDelete, idx }) {
   const c   = calcItemAmount(item);
   const set = (f, v) => onChange({ ...item, [f]: v });
@@ -423,13 +423,13 @@ function ItemRow({ item, onChange, onDelete, idx }) {
       </td>
       <td className="amount-cell">{formatINR(c.total)}</td>
       <td style={{ textAlign: 'center', width: 36 }}>
-        <button id={`del-${item.id}`} className="delete-row-btn" onClick={onDelete} title="Remove">✕</button>
+        <button id={`del-${item.id}`} className="delete-row-btn" onClick={onDelete} title="Remove"></button>
       </td>
     </tr>
   );
 }
 
-// ─── Items Panel ───────────────────────────────────────────────────────────────
+//  Items Panel 
 function ItemsPanel({ invoice, onChange }) {
   const items = invoice.items || [];
   const upd   = (idx, v) => { const n = [...items]; n[idx] = v; onChange({ ...invoice, items: n }); };
@@ -439,13 +439,13 @@ function ItemsPanel({ invoice, onChange }) {
   const half  = totalGST / 2;
   return (
     <div className="section-card">
-      <div className="section-title"><div className="section-title-icon">📋</div>Items</div>
+      <div className="section-title"><div className="section-title-icon"></div>Items</div>
       <div className="items-table-wrapper">
         <table className="items-table">
           <thead>
             <tr>
               <th>#</th><th>Item Description</th><th>Qty</th><th>Unit</th>
-              <th>Rate (₹)</th><th>Disc%</th><th>GST%</th><th>Amount</th>
+              <th>Rate ()</th><th>Disc%</th><th>GST%</th><th>Amount</th>
               <th style={{ textAlign: 'center' }}>Del</th>
             </tr>
           </thead>
@@ -463,7 +463,7 @@ function ItemsPanel({ invoice, onChange }) {
         </table>
       </div>
       <div className="add-item-row">
-        <button id="add-item-btn" className="btn btn-secondary btn-sm" onClick={add}>＋ Add Item</button>
+        <button id="add-item-btn" className="btn btn-secondary btn-sm" onClick={add}> Add Item</button>
       </div>
       <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
         <div className="gst-toggle-row" style={{ width: '100%', maxWidth: 340 }}>
@@ -480,7 +480,7 @@ function ItemsPanel({ invoice, onChange }) {
         </div>
         <div className="totals-box">
           <div className="totals-row"><span className="totals-label">Subtotal</span><span className="totals-val">{formatINR(subtotal)}</span></div>
-          {totalDisc > 0 && <div className="totals-row" style={{ color: '#ef4444' }}><span className="totals-label">Discount</span><span className="totals-val">−{formatINR(totalDisc)}</span></div>}
+          {totalDisc > 0 && <div className="totals-row" style={{ color: '#ef4444' }}><span className="totals-label">Discount</span><span className="totals-val">{formatINR(totalDisc)}</span></div>}
           {!invoice.igstMode ? <>
             <div className="totals-row"><span className="totals-label">CGST</span><span className="totals-val">{formatINR(half)}</span></div>
             <div className="totals-row"><span className="totals-label">SGST</span><span className="totals-val">{formatINR(half)}</span></div>
@@ -493,11 +493,11 @@ function ItemsPanel({ invoice, onChange }) {
   );
 }
 
-// ─── Payment & Notes ───────────────────────────────────────────────────────────
+//  Payment & Notes 
 function PaymentPanel({ invoice, onChange }) {
   return (
     <div className="section-card">
-      <div className="section-title"><div className="section-title-icon">💳</div>Payment &amp; Notes</div>
+      <div className="section-title"><div className="section-title-icon"></div>Payment &amp; Notes</div>
       <div className="form-grid full">
         <div className="form-group">
           <label>Payment Mode</label>
@@ -506,7 +506,7 @@ function PaymentPanel({ invoice, onChange }) {
               <button key={m} id={`payment-${m.toLowerCase()}`}
                 className={`payment-chip ${invoice.paymentMode === m ? 'active' : ''}`}
                 onClick={() => onChange({ ...invoice, paymentMode: m })}>
-                {m === 'Cash' ? '💵 ' : m === 'UPI' ? '📱 ' : m === 'Card' ? '💳 ' : '🤝 '}{m}
+                {m === 'Cash' ? ' ' : m === 'UPI' ? ' ' : m === 'Card' ? ' ' : ' '}{m}
               </button>
             ))}
           </div>
@@ -521,7 +521,7 @@ function PaymentPanel({ invoice, onChange }) {
   );
 }
 
-// ─── Preview Modal ─────────────────────────────────────────────────────────────
+//  Preview Modal 
 function PreviewModal({ biz, invoice, onClose }) {
   const invoiceRef  = useRef();
   const [showWA, setShowWA] = useState(false);
@@ -532,8 +532,8 @@ function PreviewModal({ biz, invoice, onClose }) {
       <div className="modal-overlay" onClick={e => e.target === e.currentTarget && !showWA && onClose()}>
         <div className="modal-box">
           <div className="modal-header no-print">
-            <span className="modal-title">{isEst ? '📋 Estimate Preview' : '🧾 Invoice Preview'}</span>
-            <button id="modal-close" className="modal-close" onClick={onClose}>✕</button>
+            <span className="modal-title">{isEst ? ' Estimate Preview' : ' Invoice Preview'}</span>
+            <button id="modal-close" className="modal-close" onClick={onClose}></button>
           </div>
 
           <div className="modal-body" ref={invoiceRef}>
@@ -541,17 +541,17 @@ function PreviewModal({ biz, invoice, onClose }) {
           </div>
 
           <div className="modal-actions no-print">
-            {/* WhatsApp — always available */}
+            {/* WhatsApp  always available */}
             <button id="modal-wa-btn" className="btn btn-whatsapp btn-lg"
               onClick={() => setShowWA(true)}>
-              📲 Send PDF on WhatsApp
+               Send PDF on WhatsApp
             </button>
 
             {/* Print / Download PDF */}
             <button id="modal-pdf-btn"
               className={`btn btn-lg ${isEst ? 'btn-estimate' : 'btn-primary'}`}
               onClick={() => window.print()}>
-              {isEst ? '🖨 Print Estimate' : '⬇ Download PDF'}
+              {isEst ? ' Print Estimate' : ' Download PDF'}
             </button>
 
             <button id="modal-close-btn" className="btn btn-secondary" onClick={onClose}>Close</button>
@@ -572,7 +572,7 @@ function PreviewModal({ biz, invoice, onClose }) {
   );
 }
 
-// ─── Main App ──────────────────────────────────────────────────────────────────
+//  Main App 
 export default function App() {
   const [biz,         setBiz]        = useState(() => loadLS('biz', { name:'', phone:'', email:'', address:'', gstin:'', logo:'' }));
   const [invoiceNum,  setInvoiceNum] = useState(() => loadLS('invoiceNum', 1));
@@ -605,22 +605,22 @@ export default function App() {
 
   return (
     <>
-      {/* ── Top Bar ── */}
+      {/*  Top Bar  */}
       <div className="topbar no-print">
         <div className="topbar-logo">
-          <div className="topbar-logo-icon">🧾</div>
+          <div className="topbar-logo-icon"></div>
           <div>
             <div className="topbar-title">InvoiceForge</div>
-            <div className="topbar-sub">{isEst ? '— Estimate Mode Active' : 'Professional Invoice Generator'}</div>
+            <div className="topbar-sub">{isEst ? ' Estimate Mode Active' : 'Professional Invoice Generator'}</div>
           </div>
         </div>
         <div className="topbar-actions">
-          <button id="save-draft-btn" className="btn btn-ghost btn-sm" onClick={saveDraft}>💾 Save</button>
-          <button id="new-invoice-btn" className="btn btn-ghost btn-sm" onClick={newInvoice}>＋ New</button>
+          <button id="save-draft-btn" className="btn btn-ghost btn-sm" onClick={saveDraft}> Save</button>
+          <button id="new-invoice-btn" className="btn btn-ghost btn-sm" onClick={newInvoice}> New</button>
         </div>
       </div>
 
-      {/* ── App Shell ── */}
+      {/*  App Shell  */}
       <div className="app-shell">
         {/* LEFT: Editor */}
         <div className="editor-panel no-print">
@@ -633,7 +633,7 @@ export default function App() {
         {/* RIGHT: Live preview */}
         <div className="preview-panel no-print">
           <div className="preview-panel-label">
-            <span>👁</span>
+            <span></span>
             {isEst ? 'Estimate Preview' : 'Live Invoice Preview'}
             <span style={{ marginLeft: 'auto', fontSize: 10, color: '#64748b', fontStyle: 'italic' }}>Real-time</span>
           </div>
@@ -645,7 +645,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── Hidden A4 render target for PDF (bottom-bar WhatsApp) ── */}
+      {/*  Hidden A4 render target for PDF (bottom-bar WhatsApp)  */}
       <div
         ref={hiddenRef}
         aria-hidden="true"
@@ -658,34 +658,34 @@ export default function App() {
         <InvoiceDocument biz={biz} invoice={invoice} forPdf={true} />
       </div>
 
-      {/* ── Bottom Actions ── */}
+      {/*  Bottom Actions  */}
       <div className="bottom-actions no-print">
         <button id="preview-btn" className={`btn btn-lg ${isEst ? 'btn-estimate' : 'btn-primary'}`}
           onClick={() => setShowPreview(true)}>
-          🔍 {isEst ? 'Preview Estimate' : 'Preview Invoice'}
+           {isEst ? 'Preview Estimate' : 'Preview Invoice'}
         </button>
 
-        {/* WhatsApp — always clickable, opens dialog */}
+        {/* WhatsApp  always clickable, opens dialog */}
         <button id="wa-bottom-btn" className="btn btn-whatsapp btn-lg"
           onClick={() => setShowWA(true)}>
-          📲 Send PDF on WhatsApp
+           Send PDF on WhatsApp
         </button>
 
         <button id="print-btn" className="btn btn-navy btn-lg"
           onClick={() => { setShowPreview(true); setTimeout(window.print, 500); }}>
-          ⬇ {isEst ? 'Print Estimate' : 'Download PDF'}
+           {isEst ? 'Print Estimate' : 'Download PDF'}
         </button>
 
-        <button id="new-btn"  className="btn btn-secondary btn-lg" onClick={newInvoice}>＋ New Invoice</button>
-        <button id="save-btn" className="btn btn-secondary btn-lg" onClick={saveDraft}>💾 Save Draft</button>
+        <button id="new-btn"  className="btn btn-secondary btn-lg" onClick={newInvoice}> New Invoice</button>
+        <button id="save-btn" className="btn btn-secondary btn-lg" onClick={saveDraft}> Save Draft</button>
       </div>
 
-      {/* ── Preview Modal ── */}
+      {/*  Preview Modal  */}
       {showPreview && (
         <PreviewModal biz={biz} invoice={invoice} onClose={() => setShowPreview(false)} />
       )}
 
-      {/* ── WhatsApp from bottom bar (uses hidden div) ── */}
+      {/*  WhatsApp from bottom bar (uses hidden div)  */}
       {showWA && !showPreview && (
         <WhatsAppModal
           biz={biz}
@@ -695,7 +695,7 @@ export default function App() {
         />
       )}
 
-      {/* ── Toast ── */}
+      {/*  Toast  */}
       {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
     </>
   );

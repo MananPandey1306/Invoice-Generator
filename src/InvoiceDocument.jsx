@@ -6,7 +6,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
-  /* ── font scale when rendering for PDF (794px wide = A4 at 96dpi) ── */
+  /*  font scale when rendering for PDF (794px wide = A4 at 96dpi)  */
   const s = forPdf ? {
     fontSize: '11.5px',
   } : {};
@@ -14,12 +14,12 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
   return (
     <div className="inv-wrap" style={{ position: 'relative', overflow: 'hidden', ...s }}>
 
-      {/* ── ESTIMATE WATERMARK STAMP ── */}
+      {/*  ESTIMATE WATERMARK STAMP  */}
       {isEstimate && (
         <div className="est-stamp" aria-hidden="true">ESTIMATE</div>
       )}
 
-      {/* ── HEADER ── */}
+      {/*  HEADER  */}
       <div className="inv-header">
         <div className="inv-header-left">
           <div className="inv-deco-slash" aria-hidden="true" />
@@ -34,13 +34,13 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
             {docTitle}
           </div>
           <div className="inv-biz-contacts">
-            {biz.phone && <span>📞 {biz.phone}</span>}
-            {biz.email && <span>✉ {biz.email}</span>}
+            {biz.phone && <span> {biz.phone}</span>}
+            {biz.email && <span> {biz.email}</span>}
           </div>
         </div>
       </div>
 
-      {/* ── META BAR ── */}
+      {/*  META BAR  */}
       <div className="inv-meta-bar">
         <div>
           <span className="inv-meta-bold">{docTitle}#&nbsp;&nbsp;</span>
@@ -48,7 +48,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
         </div>
         <div className="inv-meta-right">
           <span className="inv-meta-bold">Date: </span>
-          <span className="inv-meta-val">{invoice.invoiceDate || '—'}</span>
+          <span className="inv-meta-val">{invoice.invoiceDate || ''}</span>
           {invoice.dueDate && <>
             &emsp;
             <span className="inv-meta-bold">Due: </span>
@@ -57,7 +57,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
         </div>
       </div>
 
-      {/* ── BILL TO ── */}
+      {/*  BILL TO  */}
       <div className="inv-bill-section">
         <div>
           <div className="inv-bill-to-label">
@@ -66,21 +66,21 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
               {invoice.customerName || 'Customer Name'}
             </strong>
           </div>
-          {invoice.customerPhone  && <div className="inv-bill-detail">📞 {invoice.customerPhone}</div>}
+          {invoice.customerPhone  && <div className="inv-bill-detail"> {invoice.customerPhone}</div>}
           {invoice.customerAddress && <div className="inv-bill-detail">{invoice.customerAddress}</div>}
         </div>
         <div className="inv-bill-right">
           <div className="inv-payment-badge">
-            {invoice.paymentMode === 'Cash' ? '💵' :
-             invoice.paymentMode === 'UPI'  ? '📱' :
-             invoice.paymentMode === 'Card' ? '💳' : '🤝'}
+            {invoice.paymentMode === 'Cash' ? '' :
+             invoice.paymentMode === 'UPI'  ? '' :
+             invoice.paymentMode === 'Card' ? '' : ''}
             {' '}{invoice.paymentMode || 'Cash'}
           </div>
           {biz.gstin && <div className="inv-gstin-text">GSTIN: {biz.gstin}</div>}
         </div>
       </div>
 
-      {/* ── ITEMS TABLE ── */}
+      {/*  ITEMS TABLE  */}
       <table className="inv-table">
         <thead>
           <tr>
@@ -100,7 +100,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
             return (
               <tr key={item.id} className={idx % 2 === 1 ? 'inv-row-alt' : ''}>
                 <td className="inv-td" style={{ textAlign: 'center', fontWeight: 800, color: '#222' }}>{idx + 1}</td>
-                <td className="inv-td" style={{ fontWeight: 500 }}>{item.name || '—'}</td>
+                <td className="inv-td" style={{ fontWeight: 500 }}>{item.name || ''}</td>
                 <td className="inv-td inv-td-r">{item.qty}</td>
                 <td className="inv-td inv-td-r">{item.unit}</td>
                 <td className="inv-td inv-td-r">{formatINR(parseFloat(item.rate) || 0)}</td>
@@ -121,7 +121,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
         </tbody>
       </table>
 
-      {/* ── TOTALS ── */}
+      {/*  TOTALS  */}
       <div className="inv-totals-section">
         <div className="inv-totals-box">
           <div className="inv-totals-row">
@@ -129,7 +129,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
           </div>
           {totalDisc > 0 && (
             <div className="inv-totals-row" style={{ color: '#e53e3e' }}>
-              <span>DISCOUNT</span><span>− {formatINR(totalDisc)}</span>
+              <span>DISCOUNT</span><span> {formatINR(totalDisc)}</span>
             </div>
           )}
           {!invoice.igstMode ? (<>
@@ -144,15 +144,15 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
         </div>
       </div>
 
-      {/* ── AMOUNT IN WORDS ── */}
+      {/*  AMOUNT IN WORDS  */}
       <div className="inv-amount-words">{amountToWords(grand)}</div>
 
-      {/* ── THANK YOU ── */}
+      {/*  THANK YOU  */}
       <div className="inv-thankyou">
-        {isEstimate ? '✦ This is an estimate only — not a final invoice.' : 'Thank you for business with us!'}
+        {isEstimate ? ' This is an estimate only  not a final invoice.' : 'Thank you for business with us!'}
       </div>
 
-      {/* ── FOOTER ── */}
+      {/*  FOOTER  */}
       <div className="inv-footer">
         <div className="inv-footer-left">
           {invoice.notes && (
