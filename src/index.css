@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-/* ─── A4 Page Setup ─────────────────────────────────────────────── */
+/* --- A4 Page Setup ----------------------------------------------- */
 @page {
   size: A4 portrait;
   margin: 8mm;
 }
 
-/* ─── Design Tokens ─────────────────────────────────────────────── */
+/* --- Design Tokens ----------------------------------------------- */
 :root {
   --navy:        #1a2744;
   --navy-light:  #243157;
@@ -33,7 +33,7 @@
   --shadow-lg:   0 8px 40px rgba(26,39,68,0.18);
 }
 
-/* ─── Base ──────────────────────────────────────────────────────── */
+/* --- Base -------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
@@ -45,7 +45,7 @@ body {
   line-height: 1.6;
 }
 
-/* ─── App Shell ─────────────────────────────────────────────────── */
+/* --- App Shell --------------------------------------------------- */
 .app-shell {
   display: grid;
   grid-template-columns: 1fr;
@@ -58,7 +58,7 @@ body {
   }
 }
 
-/* ─── Top Bar ────────────────────────────────────────────────────── */
+/* --- Top Bar ------------------------------------------------------ */
 .topbar {
   background: var(--navy);
   border-bottom: 2px solid var(--teal);
@@ -90,10 +90,10 @@ body {
 }
 .topbar-actions { display: flex; gap: 8px; align-items: center; }
 
-/* ─── Editor Panel ───────────────────────────────────────────────── */
+/* --- Editor Panel ------------------------------------------------- */
 .editor-panel { padding: 20px 20px 130px; background: #0d1526; overflow-y: auto; }
 
-/* ─── Section Card ───────────────────────────────────────────────── */
+/* --- Section Card ------------------------------------------------- */
 .section-card {
   background: var(--white);
   border-radius: var(--radius);
@@ -115,7 +115,7 @@ body {
   justify-content: center; color: white; font-size: 11px;
 }
 
-/* ─── Form Grid ──────────────────────────────────────────────────── */
+/* --- Form Grid ---------------------------------------------------- */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
 .form-grid.full  { grid-template-columns: 1fr; }
@@ -140,7 +140,7 @@ input:focus, select:focus, textarea:focus {
 input::placeholder, textarea::placeholder { color: var(--gray-400); }
 textarea { resize: vertical; min-height: 68px; }
 
-/* ─── Logo Upload ────────────────────────────────────────────────── */
+/* --- Logo Upload -------------------------------------------------- */
 .logo-upload-area {
   border: 2px dashed var(--gray-300); border-radius: 8px;
   padding: 14px; text-align: center; cursor: pointer;
@@ -153,7 +153,7 @@ textarea { resize: vertical; min-height: 68px; }
 .logo-preview { max-height: 56px; max-width: 100%; object-fit: contain; border-radius: 4px; }
 .logo-upload-text { font-size: 11px; color: var(--gray-400); margin-top: 5px; }
 
-/* ─── Items Table (Editor) ───────────────────────────────────────── */
+/* --- Items Table (Editor) ----------------------------------------- */
 .items-table-wrapper { overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
 .items-table { width: 100%; min-width: 700px; border-collapse: collapse; }
 .items-table thead tr { background: var(--navy); color: white; }
@@ -177,7 +177,7 @@ textarea { resize: vertical; min-height: 68px; }
 }
 .delete-row-btn:hover { color: var(--red); background: #fee2e2; }
 
-/* ─── Buttons ────────────────────────────────────────────────────── */
+/* --- Buttons ------------------------------------------------------ */
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 16px; border-radius: 8px;
@@ -205,7 +205,7 @@ textarea { resize: vertical; min-height: 68px; }
 .btn-lg  { padding: 11px 20px; font-size: 14px; }
 .btn-icon { padding: 8px; border-radius: 7px; }
 
-/* ─── Totals Box (Editor) ────────────────────────────────────────── */
+/* --- Totals Box (Editor) ------------------------------------------ */
 .totals-box {
   margin-left: auto; width: 100%; max-width: 340px;
   background: var(--gray-50); border-radius: 8px;
@@ -226,7 +226,7 @@ textarea { resize: vertical; min-height: 68px; }
   border-radius: 6px; border-left: 3px solid var(--teal);
 }
 
-/* ─── Toggle ─────────────────────────────────────────────────────── */
+/* --- Toggle ------------------------------------------------------- */
 .toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--gray-600); }
 .toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
@@ -241,7 +241,7 @@ textarea { resize: vertical; min-height: 68px; }
 .toggle input:checked + .toggle-slider { background: var(--teal); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-/* ─── Payment Chips ──────────────────────────────────────────────── */
+/* --- Payment Chips ------------------------------------------------ */
 .payment-modes { display: flex; gap: 8px; flex-wrap: wrap; }
 .payment-chip {
   padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--gray-200);
@@ -251,7 +251,7 @@ textarea { resize: vertical; min-height: 68px; }
 .payment-chip.active { background: var(--teal); color: white; border-color: var(--teal); }
 .payment-chip:hover:not(.active) { border-color: var(--teal); color: var(--teal-dark); }
 
-/* ─── Estimate Banner ────────────────────────────────────────────── */
+/* --- Estimate Banner ---------------------------------------------- */
 .estimate-banner {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 14px; background: #fffbeb;
@@ -261,7 +261,7 @@ textarea { resize: vertical; min-height: 68px; }
 .estimate-banner-label { font-size: 12px; font-weight: 700; color: var(--navy); }
 .estimate-banner-sub { font-size: 11px; color: var(--gray-500); }
 
-/* ─── WhatsApp status pill ───────────────────────────────────────── */
+/* --- WhatsApp status pill ----------------------------------------- */
 .wa-status {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 600; padding: 3px 9px;
@@ -270,7 +270,7 @@ textarea { resize: vertical; min-height: 68px; }
 .wa-status.detected { background: #dcfce7; color: #15803d; }
 .wa-status.missing  { background: #fee2e2; color: #b91c1c; }
 
-/* ─── WhatsApp Send Modal ────────────────────────────────────────── */
+/* --- WhatsApp Send Modal ------------------------------------------ */
 .wa-modal {
   background: #16213e;
   border-radius: 14px;
@@ -355,7 +355,7 @@ textarea { resize: vertical; min-height: 68px; }
   box-shadow: 0 0 0 3px rgba(37,211,102,0.12) !important;
 }
 
-/* ─── Bottom Actions Bar ─────────────────────────────────────────── */
+/* --- Bottom Actions Bar ------------------------------------------- */
 .bottom-actions {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--navy); border-top: 2px solid var(--teal);
@@ -370,7 +370,7 @@ textarea { resize: vertical; min-height: 68px; }
   }
 }
 
-/* ─── Right Preview Panel ────────────────────────────────────────── */
+/* --- Right Preview Panel ------------------------------------------ */
 .preview-panel {
   background: #16213e;
   padding: 20px 16px;
@@ -386,7 +386,7 @@ textarea { resize: vertical; min-height: 68px; }
   margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
 }
 
-/* ─── Modal ──────────────────────────────────────────────────────── */
+/* --- Modal -------------------------------------------------------- */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(10,16,35,0.88);
   z-index: 100; display: flex; align-items: center; justify-content: center;
@@ -416,7 +416,7 @@ textarea { resize: vertical; min-height: 68px; }
   display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;
 }
 
-/* ─── Toast ──────────────────────────────────────────────────────── */
+/* --- Toast -------------------------------------------------------- */
 .save-toast {
   position: fixed; bottom: 80px; right: 24px;
   background: var(--navy); color: white; padding: 8px 16px;
@@ -428,13 +428,13 @@ textarea { resize: vertical; min-height: 68px; }
 @keyframes slideInR { from { transform: translateX(28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeOut  { from { opacity: 1; } to { opacity: 0; pointer-events: none; } }
 
-/* ─── Misc ───────────────────────────────────────────────────────── */
+/* --- Misc --------------------------------------------------------- */
 .add-item-row { padding: 10px 0 0; display: flex; align-items: center; gap: 10px; }
 .gst-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ===================================================================
    INVOICE DOCUMENT  (reference-image style)
-═══════════════════════════════════════════════════════════════════ */
+=================================================================== */
 
 .inv-wrap {
   background: white;
@@ -444,7 +444,7 @@ textarea { resize: vertical; min-height: 68px; }
   overflow: hidden;
 }
 
-/* ── Header ── */
+/* -- Header -- */
 .inv-header {
   display: flex;
   align-items: stretch;
@@ -513,7 +513,7 @@ textarea { resize: vertical; min-height: 68px; }
 .inv-biz-contacts { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
 .inv-biz-contacts span { font-size: 10.5px; color: #777; }
 
-/* ── Meta Bar ── */
+/* -- Meta Bar -- */
 .inv-meta-bar {
   background: #f4f4f4;
   border-top: 2px solid var(--teal);
@@ -525,7 +525,7 @@ textarea { resize: vertical; min-height: 68px; }
 .inv-meta-val  { color: #555; font-weight: 400; }
 .inv-meta-right { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
-/* ── Bill To ── */
+/* -- Bill To -- */
 .inv-bill-section {
   display: flex; justify-content: space-between; align-items: flex-start;
   padding: 14px 22px; gap: 16px; flex-wrap: wrap;
@@ -542,7 +542,7 @@ textarea { resize: vertical; min-height: 68px; }
 }
 .inv-gstin-text { font-size: 10px; color: #999; font-weight: 600; }
 
-/* ── Items Table ── */
+/* -- Items Table -- */
 .inv-table {
   width: 100%;
   border-collapse: collapse;
@@ -565,7 +565,7 @@ textarea { resize: vertical; min-height: 68px; }
 .inv-td-r { text-align: right; }
 .inv-row-alt { background: #f7f7f7; }
 
-/* ── Totals ── */
+/* -- Totals -- */
 .inv-totals-section {
   display: flex; justify-content: flex-end;
   padding: 14px 22px 6px;
@@ -590,20 +590,20 @@ textarea { resize: vertical; min-height: 68px; }
   letter-spacing: 0.3px;
 }
 
-/* ── Amount Words ── */
+/* -- Amount Words -- */
 .inv-amount-words {
   font-size: 10.5px; color: #888; font-style: italic;
   padding: 7px 22px;
   border-top: 1px dashed #ddd;
 }
 
-/* ── Thank You ── */
+/* -- Thank You -- */
 .inv-thankyou {
   font-size: 13px; font-weight: 700; color: #333;
   padding: 10px 22px 4px;
 }
 
-/* ── Footer ── */
+/* -- Footer -- */
 .inv-footer {
   display: flex; justify-content: space-between; align-items: flex-end;
   padding: 14px 22px 52px;
@@ -622,7 +622,7 @@ textarea { resize: vertical; min-height: 68px; }
 .inv-sign-bar   { width: 110px; height: 2px; background: var(--teal); margin-left: auto; margin-bottom: 4px; }
 .inv-sign-name  { font-size: 9.5px; color: #aaa; }
 
-/* ── Bottom-right teal corner ── */
+/* -- Bottom-right teal corner -- */
 .inv-corner-br {
   position: absolute; bottom: 0; right: 0;
   width: 140px; height: 76px;
@@ -647,7 +647,7 @@ textarea { resize: vertical; min-height: 68px; }
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
 }
 
-/* --- PRINT � A4 Portrait, Single Page ---------------------------- */
+/* --- PRINT  A4 Portrait, Single Page ---------------------------- */
 @media print {
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   html, body { width: 210mm !important; margin: 0 !important; padding: 0 !important; background: white !important; }
