@@ -10,6 +10,38 @@ const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'box', 'bag', 'roll', 'pair', 's
 const GST_OPTIONS = ['0', '5', '12', '18', '28'];
 const PAYMENT_MODES = ['Cash', 'UPI', 'Card', 'Credit'];
 
+const TEMPLATES = [
+  { id: 'classic',   label: 'Classic',   desc: 'Teal diagonal header' },
+  { id: 'wave',      label: 'Wave',       desc: 'Bold title + wave footer' },
+  { id: 'minimal',   label: 'Minimal',    desc: 'Clean cream background' },
+  { id: 'geometric', label: 'Geometric',  desc: 'Colorful corner accents' },
+  { id: 'corporate', label: 'Corporate',  desc: 'Navy blue wave header' },
+  { id: 'mono',      label: 'Mono',       desc: 'Grayscale bordered card' },
+];
+
+// Template Picker
+function TemplatePicker({ value, onChange }) {
+  return (
+    <div className="section-card">
+      <div className="section-title"><div className="section-title-icon">🎨</div>Invoice Template</div>
+      <div className="tpl-grid">
+        {TEMPLATES.map(t => (
+          <button
+            key={t.id}
+            id={`tpl-${t.id}`}
+            className={`tpl-card${value === t.id ? ' tpl-active' : ''}`}
+            onClick={() => onChange(t.id)}
+            title={t.desc}
+          >
+            <div className={`tpl-thumb tpl-thumb-${t.id}`} aria-hidden="true" />
+            <div className="tpl-label">{t.label}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 //  Phone helpers 
 function cleanPhone(raw) {
   if (!raw) return null;
@@ -547,7 +579,7 @@ function PaymentPanel({ invoice, onChange }) {
 }
 
 //  Preview Modal 
-function PreviewModal({ biz, invoice, onClose }) {
+function PreviewModal({ biz, invoice, onClose, template }) {
   const invoiceRef  = useRef();
   const [showWA, setShowWA] = useState(false);
   const isEst = invoice.isEstimate;
@@ -562,7 +594,7 @@ function PreviewModal({ biz, invoice, onClose }) {
           </div>
 
           <div className="modal-body" ref={invoiceRef}>
-            <InvoiceDocument biz={biz} invoice={invoice} forPdf={false} />
+            <InvoiceDocument biz={biz} invoice={invoice} forPdf={false} template={template} />
           </div>
 
           <div className="modal-actions no-print">
@@ -606,12 +638,18 @@ export default function App() {
   const [showWA,      setShowWA]     = useState(false);
   const [toast,       setToast]      = useState(null);
   const [showSettings,setShowSettings]=useState(false);
+  const [template,    setTemplate]   = useState(() => loadLS('template', 'classic'));
 
   // Registration gate: show onboarding if biz name not yet saved
   const [registered,  setRegistered] = useState(() => !!loadLS('biz', defaultBiz).name);
 
   // Hidden A4-width div for PDF capture from bottom bar (without opening modal)
   const hiddenRef = useRef();
+
+  function handleTemplateChange(t) {
+    setTemplate(t);
+    saveLS('template', t);
+  }
 
   useEffect(() => { saveLS('draft', invoice); }, [invoice]);
   useEffect(() => { saveLS('biz',   biz);     }, [biz]);
@@ -683,6 +721,7 @@ export default function App() {
       <div className="app-shell">
         {/* LEFT: Editor */}
         <div className="editor-panel no-print">
+          <TemplatePicker value={template} onChange={handleTemplateChange} />
           <BusinessPanel biz={biz} onChange={setBiz} />
           <CustomerPanel invoice={invoice} onChange={setInvoice} />
           <ItemsPanel    invoice={invoice} onChange={setInvoice} />
@@ -698,7 +737,7 @@ export default function App() {
           </div>
           <div id="inline-preview" style={{ overflowX: 'hidden' }}>
             <div style={{ transform: 'scale(0.76)', transformOrigin: 'top left', width: '132%' }}>
-              <InvoiceDocument biz={biz} invoice={invoice} />
+              <InvoiceDocument biz={biz} invoice={invoice} template={template} />
             </div>
           </div>
         </div>
@@ -714,7 +753,7 @@ export default function App() {
           pointerEvents: 'none', zIndex: -1,
         }}
       >
-        <InvoiceDocument biz={biz} invoice={invoice} forPdf={true} />
+        <InvoiceDocument biz={biz} invoice={invoice} forPdf={true} template={template} />
       </div>
 
       {/*  Bottom Actions  */}
@@ -741,7 +780,7 @@ export default function App() {
 
       {/*  Preview Modal  */}
       {showPreview && (
-        <PreviewModal biz={biz} invoice={invoice} onClose={() => setShowPreview(false)} />
+        <PreviewModal biz={biz} invoice={invoice} template={template} onClose={() => setShowPreview(false)} />
       )}
 
       {/*  WhatsApp from bottom bar (uses hidden div)  */}
