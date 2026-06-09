@@ -105,7 +105,7 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
                 <td className="inv-td inv-td-r">{item.unit}</td>
                 <td className="inv-td inv-td-r">{formatINR(parseFloat(item.rate) || 0)}</td>
                 <td className="inv-td inv-td-r">{item.discount || 0}%</td>
-                <td className="inv-td inv-td-r">{item.gst === '-' ? '-' : `${item.gst || 0}%`}</td>
+                <td className="inv-td inv-td-r">{item.gst || 0}%</td>
                 <td className="inv-td inv-td-r" style={{ fontWeight: 700, color: '#111' }}>{formatINR(c.total)}</td>
               </tr>
             );

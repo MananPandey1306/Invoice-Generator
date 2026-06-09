@@ -6,7 +6,7 @@ import {
 import InvoiceDocument from './InvoiceDocument';
 
 const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'box', 'bag', 'roll', 'pair', 'set', 'dozen', 'metre'];
-const GST_OPTIONS = ['-', '5', '12', '18', '28'];
+const GST_OPTIONS = ['0', '5', '12', '18', '28'];
 const PAYMENT_MODES = ['Cash', 'UPI', 'Card', 'Credit'];
 
 //  Phone helpers 
@@ -418,7 +418,7 @@ function ItemRow({ item, onChange, onDelete, idx }) {
       </td>
       <td style={{ width: 72 }}>
         <select id={`item-gst-${item.id}`} value={item.gst} onChange={e => set('gst', e.target.value)}>
-          {GST_OPTIONS.map(g => <option key={g} value={g}>{g === '-' ? '-' : `${g}%`}</option>)}
+          {GST_OPTIONS.map(g => <option key={g} value={g}>{g}%</option>)}
         </select>
       </td>
       <td className="amount-cell">{formatINR(c.total)}</td>
