@@ -171,14 +171,18 @@ export default function InvoiceDocument({ biz, invoice, forPdf = false }) {
         <div className="inv-footer-right">
           <div className="inv-auth-label">Authorised Sign</div>
           <div className="inv-auth-area">
-            <svg width="90" height="36" viewBox="0 0 90 36" fill="none">
-              <line x1="5" y1="33" x2="80" y2="6" stroke="#0ec8c8" strokeWidth="2.5" strokeLinecap="round"/>
-              <line x1="18" y1="33" x2="88" y2="9" stroke="#0ec8c8" strokeWidth="1.2" strokeLinecap="round" opacity="0.45"/>
-            </svg>
+            {biz.stampImg
+              ? <img src={biz.stampImg} alt="signature" className="inv-stamp-img" />
+              : <svg width="90" height="36" viewBox="0 0 90 36" fill="none">
+                  <line x1="5" y1="33" x2="80" y2="6" stroke="#0ec8c8" strokeWidth="2.5" strokeLinecap="round"/>
+                  <line x1="18" y1="33" x2="88" y2="9" stroke="#0ec8c8" strokeWidth="1.2" strokeLinecap="round" opacity="0.45"/>
+                </svg>
+            }
           </div>
           <div className="inv-sign-bar" />
-          <div className="inv-sign-name">{biz.name || ''}</div>
+          <div className="inv-sign-name">{biz.signName || biz.name || ''}</div>
         </div>
+
       </div>
 
       {/* Bottom-right teal corner */}

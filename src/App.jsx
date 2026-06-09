@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   loadLS, saveLS, defaultItem, defaultInvoice,
-  calcItemAmount, calcTotals, formatINR, amountToWords
+  calcItemAmount, calcTotals, formatINR, amountToWords, defaultBiz
 } from './utils';
 import InvoiceDocument from './InvoiceDocument';
+import RegisterScreen from './RegisterScreen';
 
 const UNITS = ['pcs', 'kg', 'g', 'litre', 'ml', 'box', 'bag', 'roll', 'pair', 'set', 'dozen', 'metre'];
 const GST_OPTIONS = ['0', '5', '12', '18', '28'];
@@ -574,18 +575,30 @@ function PreviewModal({ biz, invoice, onClose }) {
 
 //  Main App 
 export default function App() {
-  const [biz,         setBiz]        = useState(() => loadLS('biz', { name:'', phone:'', email:'', address:'', gstin:'', logo:'' }));
+  const [biz,         setBiz]        = useState(() => loadLS('biz', defaultBiz));
   const [invoiceNum,  setInvoiceNum] = useState(() => loadLS('invoiceNum', 1));
   const [invoice,     setInvoice]    = useState(() => loadLS('draft', defaultInvoice(loadLS('invoiceNum', 1))));
   const [showPreview, setShowPreview]= useState(false);
   const [showWA,      setShowWA]     = useState(false);
   const [toast,       setToast]      = useState(null);
+  const [showSettings,setShowSettings]=useState(false);
+
+  // Registration gate: show onboarding if biz name not yet saved
+  const [registered,  setRegistered] = useState(() => !!loadLS('biz', defaultBiz).name);
 
   // Hidden A4-width div for PDF capture from bottom bar (without opening modal)
   const hiddenRef = useRef();
 
   useEffect(() => { saveLS('draft', invoice); }, [invoice]);
   useEffect(() => { saveLS('biz',   biz);     }, [biz]);
+
+  function handleRegistration(bizData) {
+    const merged = { ...defaultBiz, ...bizData };
+    setBiz(merged);
+    saveLS('biz', merged);
+    setRegistered(true);
+    setShowSettings(false);
+  }
 
   const showToast = msg => { setToast(null); setTimeout(() => setToast(msg), 10); };
 
@@ -603,6 +616,11 @@ export default function App() {
 
   const isEst = invoice.isEstimate;
 
+  // Show registration screen on first visit
+  if (!registered) {
+    return <RegisterScreen onComplete={handleRegistration} />;
+  }
+
   return (
     <>
       {/*  Top Bar  */}
@@ -617,8 +635,25 @@ export default function App() {
         <div className="topbar-actions">
           <button id="save-draft-btn" className="btn btn-ghost btn-sm" onClick={saveDraft}> Save</button>
           <button id="new-invoice-btn" className="btn btn-ghost btn-sm" onClick={newInvoice}> New</button>
+          <button id="settings-btn" className="btn btn-ghost btn-sm" title="Business Settings"
+            onClick={() => setShowSettings(true)}>⚙️ Profile</button>
         </div>
       </div>
+
+      {/*  Settings Modal  */}
+      {showSettings && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowSettings(false)}>
+          <div className="modal-box" style={{ maxWidth: 640, background: '#0d1526' }}>
+            <div className="modal-header">
+              <span className="modal-title">⚙️ Business Profile</span>
+              <button className="modal-close" onClick={() => setShowSettings(false)}>✕</button>
+            </div>
+            <div style={{ padding: '0' }}>
+              <RegisterScreen initial={biz} onComplete={handleRegistration} isModal={true} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/*  App Shell  */}
       <div className="app-shell">

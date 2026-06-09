@@ -680,3 +680,250 @@ textarea { resize: vertical; min-height: 68px; }
   .inv-corner-br { -webkit-print-color-adjust: exact !important; }
   .est-stamp { -webkit-print-color-adjust: exact !important; }
 }
+
+/* ===================================================================
+   REGISTRATION / ONBOARDING SCREEN
+=================================================================== */
+
+.rg-overlay {
+  position: fixed; inset: 0;
+  background: #0a1020;
+  z-index: 200;
+  display: flex; align-items: stretch;
+  overflow-y: auto;
+}
+.rg-overlay.rg-modal-mode {
+  position: static;
+  background: transparent;
+  display: block;
+}
+
+/* Shell: hero + card side by side */
+.rg-shell {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+.rg-modal-mode .rg-shell {
+  min-height: unset;
+}
+
+/* ── Hero (left) ─────────────────────────────────── */
+.rg-hero {
+  flex: 0 0 42%;
+  background: linear-gradient(145deg, #0d1f3c 0%, #0a2a2a 100%);
+  padding: 60px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.rg-hero::before {
+  content: '';
+  position: absolute; top: -80px; right: -80px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(14,200,200,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.rg-hero::after {
+  content: '';
+  position: absolute; bottom: -60px; left: -60px;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(14,200,200,0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.rg-hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(14,200,200,0.12);
+  border: 1px solid rgba(14,200,200,0.3);
+  color: var(--teal); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.8px; padding: 5px 14px; border-radius: 20px;
+  margin-bottom: 32px; width: fit-content;
+}
+.rg-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px; font-weight: 900;
+  color: white; line-height: 1.15;
+  margin-bottom: 20px; letter-spacing: -0.5px;
+}
+.rg-hero-accent { color: var(--teal); }
+.rg-hero-sub {
+  font-size: 14px; color: rgba(255,255,255,0.55);
+  line-height: 1.7; margin-bottom: 36px;
+}
+.rg-hero-features { display: flex; flex-direction: column; gap: 10px; }
+.rg-feat {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500;
+}
+.rg-feat-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--teal); flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(14,200,200,0.6);
+}
+.rg-hero-glow {
+  position: absolute; bottom: 0; right: 0;
+  width: 180px; height: 180px;
+  background: var(--teal);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  opacity: 0.06; pointer-events: none;
+}
+
+/* ── Card (right / full on mobile) ───────────────── */
+.rg-card {
+  flex: 1;
+  background: #111827;
+  padding: 52px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+.rg-card-modal {
+  background: transparent;
+  padding: 24px 28px;
+  animation: none;
+}
+
+.rg-modal-logo-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--teal);
+  margin-bottom: 6px; letter-spacing: 0.4px;
+}
+.rg-modal-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--teal);
+}
+
+.rg-card-header { margin-bottom: 28px; }
+.rg-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 800;
+  color: white; margin-bottom: 6px; letter-spacing: -0.3px;
+}
+.rg-card-sub { font-size: 13px; color: #64748b; }
+
+/* ── Form elements ───────────────────────────────── */
+.rg-form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+.rg-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; color: #94a3b8;
+}
+.rg-optional { font-weight: 400; text-transform: none; color: #475569; }
+.rg-input {
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px; color: white; outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  width: 100%;
+}
+.rg-input::placeholder { color: #475569; }
+.rg-input:focus {
+  border-color: var(--teal); background: rgba(14,200,200,0.06);
+  box-shadow: 0 0 0 3px rgba(14,200,200,0.12);
+}
+.rg-input-err { border-color: #f87171 !important; }
+.rg-err-msg { font-size: 11px; color: #f87171; margin-top: 2px; }
+
+.rg-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .rg-grid-2 { grid-template-columns: 1fr; } }
+
+/* ── Logo upload ─────────────────────────────────── */
+.rg-logo-name-row { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 14px; }
+.rg-upload-wrap { flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
+.rg-logo-drop {
+  width: 88px; height: 76px;
+  border: 2px dashed rgba(255,255,255,0.15); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+  background: rgba(255,255,255,0.04); overflow: hidden;
+}
+.rg-logo-drop:hover { border-color: var(--teal); background: rgba(14,200,200,0.07); }
+.rg-logo-preview { max-height: 64px; max-width: 80px; object-fit: contain; border-radius: 6px; }
+.rg-upload-placeholder { text-align: center; }
+.rg-upload-icon { font-size: 22px; line-height: 1; }
+.rg-upload-hint { font-size: 10px; color: #475569; margin-top: 4px; }
+.rg-upload-subhint { font-size: 9.5px; color: #334155; margin-top: 2px; }
+.rg-remove-btn {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171; font-size: 10.5px; font-weight: 600;
+  padding: 3px 8px; border-radius: 5px; cursor: pointer;
+  transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+}
+.rg-remove-btn:hover { background: rgba(239,68,68,0.2); }
+
+/* ── Divider ─────────────────────────────────────── */
+.rg-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 18px 0 16px;
+}
+.rg-divider::before, .rg-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.rg-divider-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; color: #475569; white-space: nowrap;
+}
+
+/* ── Signature section ───────────────────────────── */
+.rg-sig-section { display: flex; gap: 16px; align-items: flex-start; }
+.rg-sig-upload-col { flex-shrink: 0; display: flex; flex-direction: column; gap: 6px; }
+.rg-sig-name-col { flex: 1; }
+.rg-stamp-drop {
+  width: 148px; height: 88px;
+  border: 2px dashed rgba(14,200,200,0.25); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s;
+  background: rgba(14,200,200,0.03); overflow: hidden;
+  padding: 6px;
+}
+.rg-stamp-drop:hover { border-color: var(--teal); background: rgba(14,200,200,0.08); }
+.rg-stamp-has-img { border-style: solid; border-color: rgba(14,200,200,0.4); }
+.rg-stamp-preview { max-height: 76px; max-width: 136px; object-fit: contain; }
+.rg-sig-note {
+  font-size: 11px; color: #475569; line-height: 1.6;
+  margin-top: 8px; padding: 8px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px; border-left: 2px solid rgba(14,200,200,0.3);
+}
+
+/* ── CTA button ──────────────────────────────────── */
+.rg-cta {
+  width: 100%; margin-top: 26px; padding: 13px 20px;
+  background: var(--teal); color: white;
+  border: none; border-radius: 10px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: 0.2px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(14,200,200,0.3);
+}
+.rg-cta:hover:not(:disabled) {
+  background: var(--teal-dark);
+  box-shadow: 0 6px 28px rgba(14,200,200,0.45);
+  transform: translateY(-1px);
+}
+.rg-cta:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.rg-cta-loading { opacity: 0.8; }
+.rg-spinner {
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* ── Responsive: stack on mobile ─────────────────── */
+@media (max-width: 900px) {
+  .rg-hero { display: none; }
+  .rg-card { padding: 36px 24px; }
+}
+
+/* ===================================================================
+   INVOICE STAMP IMAGE
+=================================================================== */
+.inv-stamp-img {
+  max-height: 54px; max-width: 120px;
+  object-fit: contain;
+}

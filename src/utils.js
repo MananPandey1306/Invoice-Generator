@@ -140,3 +140,6 @@ export function defaultInvoice(num) {
     items: [defaultItem()],
   };
 }
+export const defaultBiz = {
+  name: '', phone: '', email: '', address: '', gstin: '', logo: '', stampImg: '', signName: '',
+};
