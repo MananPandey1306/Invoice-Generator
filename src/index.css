@@ -931,6 +931,26 @@ textarea { resize: vertical; min-height: 68px; }
 }
 
 /* ===================================================================
+   PAYMENT PANEL — Stamp / Signature upload drop zone
+=================================================================== */
+.pmt-stamp-drop {
+  width: 100%;
+  max-width: 220px;
+  height: 90px;
+  border: 2px dashed rgba(14,200,200,0.35);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  cursor: pointer; transition: all 0.2s;
+  background: rgba(14,200,200,0.04);
+  overflow: hidden; padding: 8px;
+  text-align: center;
+}
+.pmt-stamp-drop:hover { border-color: var(--teal); background: rgba(14,200,200,0.09); }
+.pmt-stamp-has-img { border-style: solid; border-color: rgba(14,200,200,0.45); }
+.pmt-stamp-preview { max-height: 74px; max-width: 200px; object-fit: contain; display: block; }
+
+/* ===================================================================
    TEMPLATE PICKER
 =================================================================== */
 .tpl-grid {

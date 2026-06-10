@@ -413,11 +413,7 @@ function CustomerPanel({ invoice, onChange }) {
           <input id="inv-date" type="date" value={invoice.invoiceDate}
             onChange={e => onChange({ ...invoice, invoiceDate: e.target.value })} />
         </div>
-        <div className="form-group">
-          <label htmlFor="due-date">{isEst ? 'Valid Till' : 'Due Date'}</label>
-          <input id="due-date" type="date" value={invoice.dueDate}
-            onChange={e => onChange({ ...invoice, dueDate: e.target.value })} />
-        </div>
+
         <div className="form-group">
           <label htmlFor="cust-phone">
             Customer Phone
@@ -551,7 +547,14 @@ function ItemsPanel({ invoice, onChange }) {
 }
 
 //  Payment & Notes 
-function PaymentPanel({ invoice, onChange }) {
+function PaymentPanel({ invoice, onChange, biz, onBizChange }) {
+  const stampRef = useRef();
+  function handleStamp(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => onBizChange({ ...biz, stampImg: ev.target.result });
+    r.readAsDataURL(file);
+  }
   return (
     <div className="section-card">
       <div className="section-title"><div className="section-title-icon"></div>Payment &amp; Notes</div>
@@ -563,7 +566,7 @@ function PaymentPanel({ invoice, onChange }) {
               <button key={m} id={`payment-${m.toLowerCase()}`}
                 className={`payment-chip ${invoice.paymentMode === m ? 'active' : ''}`}
                 onClick={() => onChange({ ...invoice, paymentMode: m })}>
-                {m === 'Cash' ? ' ' : m === 'UPI' ? ' ' : m === 'Card' ? ' ' : ' '}{m}
+                {m === 'Cash' ? '💵 ' : m === 'UPI' ? '📱 ' : m === 'Card' ? '💳 ' : '🏦 '}{m}
               </button>
             ))}
           </div>
@@ -572,6 +575,45 @@ function PaymentPanel({ invoice, onChange }) {
           <label htmlFor="notes">Terms &amp; Notes</label>
           <textarea id="notes" placeholder="e.g. Goods once sold will not be returned."
             value={invoice.notes} onChange={e => onChange({ ...invoice, notes: e.target.value })} rows={3} />
+        </div>
+
+        {/* Signing Authority */}
+        <div className="form-group">
+          <label htmlFor="sign-name">Signing Authority Name</label>
+          <input
+            id="sign-name"
+            placeholder="e.g. Ramesh Sharma (Owner)"
+            value={biz.signName || ''}
+            onChange={e => onBizChange({ ...biz, signName: e.target.value })}
+          />
+          <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>Appears below the signature line on invoices.</div>
+        </div>
+
+        {/* Stamp Upload */}
+        <div className="form-group">
+          <label>Signature / Stamp Image</label>
+          <div
+            className={`pmt-stamp-drop${biz.stampImg ? ' pmt-stamp-has-img' : ''}`}
+            onClick={() => stampRef.current.click()}
+            title="Click to upload stamp or signature"
+          >
+            <input ref={stampRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleStamp} />
+            {biz.stampImg
+              ? <img src={biz.stampImg} alt="stamp" className="pmt-stamp-preview" />
+              : <>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>🖊️</div>
+                  <div style={{ fontSize: 12, color: '#64748b' }}>Click to upload signature or stamp</div>
+                </>
+            }
+          </div>
+          {biz.stampImg && (
+            <button
+              type="button"
+              className="btn btn-danger btn-sm"
+              style={{ marginTop: 6 }}
+              onClick={() => onBizChange({ ...biz, stampImg: '' })}
+            >Remove Stamp</button>
+          )}
         </div>
       </div>
     </div>
@@ -725,7 +767,7 @@ export default function App() {
           <BusinessPanel biz={biz} onChange={setBiz} />
           <CustomerPanel invoice={invoice} onChange={setInvoice} />
           <ItemsPanel    invoice={invoice} onChange={setInvoice} />
-          <PaymentPanel  invoice={invoice} onChange={setInvoice} />
+          <PaymentPanel  invoice={invoice} onChange={setInvoice} biz={biz} onBizChange={setBiz} />
         </div>
 
         {/* RIGHT: Live preview */}
