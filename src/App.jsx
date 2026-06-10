@@ -3,6 +3,12 @@ import {
   loadLS, saveLS, defaultItem, defaultInvoice,
   calcItemAmount, calcTotals, formatINR, amountToWords, defaultBiz
 } from './utils';
+import {
+  isFileSystemSupported,
+  saveHandleToIDB, loadHandleFromIDB, clearHandleFromIDB,
+  requestPermission, writeToFile, readFromFile,
+  OPEN_OPTS, SAVE_OPTS, buildSavePayload,
+} from './fileStorage';
 import InvoiceDocument from './InvoiceDocument';
 import RegisterScreen from './RegisterScreen';
 
@@ -671,6 +677,41 @@ function PreviewModal({ biz, invoice, onClose, template }) {
   );
 }
 
+// ── File Splash Screen ───────────────────────────────────────────
+function FileSplash({ onOpen, onCreate, onSkip, loading }) {
+  return (
+    <div className="fs-overlay">
+      <div className="fs-card">
+        <div className="fs-logo">
+          <div className="topbar-logo-icon" style={{ width: 44, height: 44, fontSize: 22 }}></div>
+          <div className="fs-logo-name">InvoiceForge</div>
+        </div>
+        <h2 className="fs-title">Where should your data be saved?</h2>
+        <p className="fs-sub">Choose a <strong>.invoiceforge</strong> file on your computer — your business profile, invoice drafts, and settings will all live there.</p>
+
+        {loading
+          ? <div className="fs-loading"><div className="wa-spinner" style={{ width: 32, height: 32, borderWidth: 3 }} /><span>Loading file…</span></div>
+          : (
+            <div className="fs-actions">
+              <button id="fs-open-btn" className="fs-action-card" onClick={onOpen}>
+                <span className="fs-action-icon">📂</span>
+                <span className="fs-action-label">Open Existing File</span>
+                <span className="fs-action-sub">Load a previously saved .invoiceforge file</span>
+              </button>
+              <button id="fs-create-btn" className="fs-action-card" onClick={onCreate}>
+                <span className="fs-action-icon">📄</span>
+                <span className="fs-action-label">Create New File</span>
+                <span className="fs-action-sub">Pick a location and start a fresh data file</span>
+              </button>
+            </div>
+          )
+        }
+        <button className="fs-skip" onClick={onSkip}>⚡ Use browser storage instead (temporary)</button>
+      </div>
+    </div>
+  );
+}
+
 //  Main App 
 export default function App() {
   const [biz,         setBiz]        = useState(() => loadLS('biz', defaultBiz));
@@ -685,14 +726,100 @@ export default function App() {
   // Registration gate: show onboarding if biz name not yet saved
   const [registered,  setRegistered] = useState(() => !!loadLS('biz', defaultBiz).name);
 
+  // File system state
+  const FS = isFileSystemSupported();
+  const [fileHandle, setFileHandle]  = useState(null);
+  const [fileName,   setFileName]    = useState('');
+  // 'checking' | 'splash' | 'splashLoading' | 'ready'
+  const [fileStep,   setFileStep]    = useState(FS ? 'checking' : 'ready');
+
   // Hidden A4-width div for PDF capture from bottom bar (without opening modal)
   const hiddenRef = useRef();
+
+  // On mount: try to restore last-used file handle from IndexedDB
+  useEffect(() => {
+    if (!FS) return;
+    (async () => {
+      const handle = await loadHandleFromIDB();
+      if (!handle) { setFileStep('splash'); return; }
+      const ok = await requestPermission(handle);
+      if (!ok)     { setFileStep('splash'); return; }
+      try {
+        const data = await readFromFile(handle);
+        applyFileData(data);
+        setFileHandle(handle);
+        setFileName(handle.name);
+        setFileStep('ready');
+      } catch {
+        setFileStep('splash');
+      }
+    })();
+  }, []);
+
+  // Apply data loaded from a .invoiceforge file into React state
+  function applyFileData(data) {
+    if (data.biz)        { setBiz({ ...defaultBiz, ...data.biz }); saveLS('biz', { ...defaultBiz, ...data.biz }); }
+    if (data.draft)      { setInvoice(data.draft);                  saveLS('draft', data.draft); }
+    if (data.invoiceNum) { setInvoiceNum(data.invoiceNum);          saveLS('invoiceNum', data.invoiceNum); }
+    if (data.template)   { setTemplate(data.template);              saveLS('template', data.template); }
+    if (data.biz?.name)  setRegistered(true);
+  }
+
+  // Open an existing .invoiceforge file
+  async function openFile() {
+    try {
+      setFileStep('splashLoading');
+      const [handle] = await window.showOpenFilePicker(OPEN_OPTS);
+      const data = await readFromFile(handle);
+      applyFileData(data);
+      setFileHandle(handle);
+      setFileName(handle.name);
+      await saveHandleToIDB(handle);
+      setFileStep('ready');
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error(e);
+      setFileStep('splash');
+    }
+  }
+
+  // Create a new .invoiceforge file
+  async function createFile() {
+    try {
+      setFileStep('splashLoading');
+      const handle = await window.showSaveFilePicker(SAVE_OPTS);
+      const payload = buildSavePayload(biz, invoice, invoiceNum, template);
+      await writeToFile(handle, payload);
+      setFileHandle(handle);
+      setFileName(handle.name);
+      await saveHandleToIDB(handle);
+      setFileStep('ready');
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error(e);
+      setFileStep('splash');
+    }
+  }
+
+  // Save As — pick a new file location
+  async function saveAs() {
+    try {
+      const handle = await window.showSaveFilePicker({ ...SAVE_OPTS, suggestedName: fileName || 'my-business.invoiceforge' });
+      const payload = buildSavePayload(biz, invoice, invoiceNum, template);
+      await writeToFile(handle, payload);
+      setFileHandle(handle);
+      setFileName(handle.name);
+      await saveHandleToIDB(handle);
+      showToast(`Saved as ${handle.name}`);
+    } catch (e) {
+      if (e.name !== 'AbortError') console.error(e);
+    }
+  }
 
   function handleTemplateChange(t) {
     setTemplate(t);
     saveLS('template', t);
   }
 
+  // Always keep localStorage in sync as a backup
   useEffect(() => { saveLS('draft', invoice); }, [invoice]);
   useEffect(() => { saveLS('biz',   biz);     }, [biz]);
 
@@ -713,12 +840,57 @@ export default function App() {
     setInvoice(fresh); saveLS('draft', fresh);
     showToast('New invoice started');
   }
-  function saveDraft() {
+
+  async function saveDraft() {
     saveLS('draft', invoice); saveLS('biz', biz);
-    showToast('Draft saved!');
+    if (fileHandle) {
+      try {
+        const payload = buildSavePayload(biz, invoice, invoiceNum, template);
+        await writeToFile(fileHandle, payload);
+        showToast(`💾 Saved to ${fileName}`);
+      } catch {
+        showToast('⚠️ File save failed — saved to browser storage');
+      }
+    } else if (FS) {
+      // No file chosen yet — ask user to pick one now
+      try {
+        const handle = await window.showSaveFilePicker(SAVE_OPTS);
+        const payload = buildSavePayload(biz, invoice, invoiceNum, template);
+        await writeToFile(handle, payload);
+        setFileHandle(handle);
+        setFileName(handle.name);
+        await saveHandleToIDB(handle);
+        showToast(`💾 Saved to ${handle.name}`);
+      } catch (e) {
+        if (e.name !== 'AbortError') showToast('Draft saved to browser storage');
+        else showToast('Draft saved to browser storage');
+      }
+    } else {
+      showToast('Draft saved!');
+    }
   }
 
   const isEst = invoice.isEstimate;
+
+  // File step guards
+  if (fileStep === 'checking') {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#080f1e', flexDirection: 'column', gap: 16 }}>
+        <div className="wa-spinner" style={{ width: 36, height: 36, borderWidth: 3 }} />
+        <div style={{ color: '#64748b', fontSize: 13 }}>Connecting to your data file…</div>
+      </div>
+    );
+  }
+  if (fileStep === 'splash' || fileStep === 'splashLoading') {
+    return (
+      <FileSplash
+        loading={fileStep === 'splashLoading'}
+        onOpen={openFile}
+        onCreate={createFile}
+        onSkip={() => setFileStep('ready')}
+      />
+    );
+  }
 
   // Show registration screen on first visit
   if (!registered) {
@@ -736,8 +908,19 @@ export default function App() {
             <div className="topbar-sub">{isEst ? ' Estimate Mode Active' : 'Professional Invoice Generator'}</div>
           </div>
         </div>
+        {/* Active file badge */}
+        {fileName && (
+          <div className="topbar-filebadge" title={fileName}>
+            <span>📄</span>
+            <span className="topbar-filebadge-name">{fileName}</span>
+          </div>
+        )}
         <div className="topbar-actions">
-          <button id="save-draft-btn" className="btn btn-ghost btn-sm" onClick={saveDraft}> Save</button>
+          <button id="save-draft-btn" className="btn btn-ghost btn-sm" onClick={saveDraft}>💾 Save</button>
+          {FS && <button id="save-as-btn" className="btn btn-ghost btn-sm" onClick={saveAs}>Save As…</button>}
+          {FS && !fileHandle && (
+            <button id="open-file-btn" className="btn btn-ghost btn-sm" onClick={() => setFileStep('splash')}>📂 Open File</button>
+          )}
           <button id="new-invoice-btn" className="btn btn-ghost btn-sm" onClick={newInvoice}> New</button>
           <button id="settings-btn" className="btn btn-ghost btn-sm" title="Business Settings"
             onClick={() => setShowSettings(true)}>⚙️ Profile</button>
