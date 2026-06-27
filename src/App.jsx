@@ -381,6 +381,7 @@ function BusinessPanel({ biz, onChange }) {
 function CustomerPanel({ invoice, onChange }) {
   const isEst = invoice.isEstimate;
   const num   = cleanPhone(invoice.customerPhone);
+  const showDue = !!invoice.showDueDate;
   return (
     <div className="section-card">
       <div className="section-title"><div className="section-title-icon"></div>Customer &amp; Invoice Details</div>
@@ -420,6 +421,25 @@ function CustomerPanel({ invoice, onChange }) {
             onChange={e => onChange({ ...invoice, invoiceDate: e.target.value })} />
         </div>
 
+        {/* Due Date — optional toggle */}
+        <div className="form-group span-2">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <label className="toggle" style={{ marginBottom: 0 }}>
+              <input id="due-date-toggle" type="checkbox" checked={showDue}
+                onChange={e => onChange({ ...invoice, showDueDate: e.target.checked, dueDate: e.target.checked ? (invoice.dueDate || '') : '' })} />
+              <span className="toggle-slider" />
+            </label>
+            <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {isEst ? 'Valid Till' : 'Due Date'} (optional)
+            </span>
+          </label>
+          {showDue && (
+            <input id="due-date" type="date" value={invoice.dueDate || ''}
+              style={{ marginTop: 6 }}
+              onChange={e => onChange({ ...invoice, dueDate: e.target.value })} />
+          )}
+        </div>
+
         <div className="form-group">
           <label htmlFor="cust-phone">
             Customer Phone
@@ -449,7 +469,9 @@ function CustomerPanel({ invoice, onChange }) {
 
 //  Item Row 
 function ItemRow({ item, onChange, onDelete, idx }) {
-  const c   = calcItemAmount(item);
+  const isFree = !!item.free;
+  const effItem = isFree ? { ...item, rate: '0', discount: '0', gst: '0' } : item;
+  const c   = calcItemAmount(effItem);
   const set = (f, v) => onChange({ ...item, [f]: v });
   return (
     <tr>
@@ -467,20 +489,45 @@ function ItemRow({ item, onChange, onDelete, idx }) {
           {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
         </select>
       </td>
-      <td style={{ width: 90 }}>
-        <input id={`item-rate-${item.id}`} type="number" min="0" step="any" placeholder="0.00"
-          value={item.rate} onChange={e => set('rate', e.target.value)} />
+      <td style={{ width: 110 }}>
+        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+          <input id={`item-rate-${item.id}`} type="number" min="0" step="any" placeholder="0.00"
+            value={isFree ? '' : item.rate}
+            disabled={isFree}
+            onChange={e => set('rate', e.target.value)}
+            style={{ opacity: isFree ? 0.4 : 1, minWidth: 58 }} />
+          <button
+            id={`item-free-${item.id}`}
+            title="Mark as FREE"
+            onClick={() => set('free', !isFree)}
+            style={{
+              padding: '3px 6px', fontSize: 10, fontWeight: 800, borderRadius: 5, border: 'none',
+              cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '0.3px',
+              background: isFree ? '#10b981' : 'rgba(16,185,129,0.12)',
+              color: isFree ? '#fff' : '#10b981',
+              transition: 'all 0.18s',
+            }}
+          >FREE</button>
+        </div>
       </td>
       <td style={{ width: 70 }}>
         <input id={`item-disc-${item.id}`} type="number" min="0" max="100" step="any"
-          value={item.discount} onChange={e => set('discount', e.target.value)} />
+          value={item.discount} disabled={isFree}
+          onChange={e => set('discount', e.target.value)}
+          style={{ opacity: isFree ? 0.4 : 1 }} />
       </td>
       <td style={{ width: 72 }}>
-        <select id={`item-gst-${item.id}`} value={item.gst} onChange={e => set('gst', e.target.value)}>
+        <select id={`item-gst-${item.id}`} value={item.gst} disabled={isFree}
+          onChange={e => set('gst', e.target.value)}
+          style={{ opacity: isFree ? 0.4 : 1 }}>
           {GST_OPTIONS.map(g => <option key={g} value={g}>{g}%</option>)}
         </select>
       </td>
-      <td className="amount-cell">{formatINR(c.total)}</td>
+      <td className="amount-cell">
+        {isFree
+          ? <span style={{ color: '#10b981', fontWeight: 800, fontSize: 11, letterSpacing: '0.5px' }}>FREE</span>
+          : formatINR(c.total)}
+      </td>
       <td style={{ textAlign: 'center', width: 36 }}>
         <button id={`del-${item.id}`} className="delete-row-btn" onClick={onDelete} title="Remove"></button>
       </td>
@@ -494,7 +541,10 @@ function ItemsPanel({ invoice, onChange }) {
   const upd   = (idx, v) => { const n = [...items]; n[idx] = v; onChange({ ...invoice, items: n }); };
   const del   = idx => onChange({ ...invoice, items: items.filter((_, i) => i !== idx) });
   const add   = () => onChange({ ...invoice, items: [...items, defaultItem()] });
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(items);
+  const clearAll = () => { if (window.confirm('Clear all items?')) onChange({ ...invoice, items: [] }); };
+  const { subtotal, totalDisc, totalGST, grand } = calcTotals(
+    items.map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i)
+  );
   const half  = totalGST / 2;
   return (
     <div className="section-card">
@@ -504,7 +554,7 @@ function ItemsPanel({ invoice, onChange }) {
           <thead>
             <tr>
               <th>#</th><th>Item Description</th><th>Qty</th><th>Unit</th>
-              <th>Rate ()</th><th>Disc%</th><th>GST%</th><th>Amount</th>
+              <th>Rate (₹) / Free</th><th>Disc%</th><th>GST%</th><th>Amount</th>
               <th style={{ textAlign: 'center' }}>Del</th>
             </tr>
           </thead>
@@ -523,6 +573,10 @@ function ItemsPanel({ invoice, onChange }) {
       </div>
       <div className="add-item-row">
         <button id="add-item-btn" className="btn btn-secondary btn-sm" onClick={add}> Add Item</button>
+        {items.length > 0 && (
+          <button id="clear-items-btn" className="btn btn-danger btn-sm" onClick={clearAll}
+            style={{ marginLeft: 8 }}>🗑 Clear All</button>
+        )}
       </div>
       <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
         <div className="gst-toggle-row" style={{ width: '100%', maxWidth: 340 }}>

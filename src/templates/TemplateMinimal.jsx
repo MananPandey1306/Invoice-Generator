@@ -2,7 +2,8 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 
 export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(invoice.items || []);
+  const paidItems = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
+  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'Estimate' : 'Invoice';
 
@@ -68,16 +69,17 @@ export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
         </thead>
         <tbody>
           {(invoice.items || []).map((item, idx) => {
-            const c = calcItemAmount(item);
+            const effItem = item.free ? { ...item, rate: '0', discount: '0', gst: '0' } : item;
+            const c = calcItemAmount(effItem);
             return (
               <tr key={item.id} className="tmin-tr">
                 <td className="tmin-td">{item.name || ''}</td>
                 <td className="tmin-td tmin-r">{item.qty}</td>
                 <td className="tmin-td tmin-r">{item.unit}</td>
-                <td className="tmin-td tmin-r">{formatINR(parseFloat(item.rate) || 0)}</td>
-                <td className="tmin-td tmin-r">{item.discount || 0}%</td>
-                <td className="tmin-td tmin-r">{item.gst || 0}%</td>
-                <td className="tmin-td tmin-r tmin-bold">{formatINR(c.total)}</td>
+                <td className="tmin-td tmin-r">{item.free ? '—' : formatINR(parseFloat(item.rate) || 0)}</td>
+                <td className="tmin-td tmin-r">{item.free ? '—' : `${item.discount || 0}%`}</td>
+                <td className="tmin-td tmin-r">{item.free ? '—' : `${item.gst || 0}%`}</td>
+                <td className="tmin-td tmin-r tmin-bold" style={item.free ? { color: '#10b981' } : {}}>{item.free ? 'FREE' : formatINR(c.total)}</td>
               </tr>
             );
           })}

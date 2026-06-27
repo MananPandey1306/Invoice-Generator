@@ -2,8 +2,10 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 
 export default function TemplateClassic({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(invoice.items || []);
+  const paidItems  = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
+  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
   const half = totalGST / 2;
+
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
   const s = forPdf ? { fontSize: '11.5px' } : {};
@@ -92,20 +94,24 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
         </thead>
         <tbody>
           {(invoice.items || []).map((item, idx) => {
-            const c = calcItemAmount(item);
+            const effItem = item.free ? { ...item, rate: '0', discount: '0', gst: '0' } : item;
+            const c = calcItemAmount(effItem);
             return (
               <tr key={item.id} className={idx % 2 === 1 ? 'inv-row-alt' : ''}>
                 <td className="inv-td" style={{ textAlign: 'center', fontWeight: 800, color: '#222' }}>{idx + 1}</td>
                 <td className="inv-td" style={{ fontWeight: 500 }}>{item.name || ''}</td>
                 <td className="inv-td inv-td-r">{item.qty}</td>
                 <td className="inv-td inv-td-r">{item.unit}</td>
-                <td className="inv-td inv-td-r">{formatINR(parseFloat(item.rate) || 0)}</td>
-                <td className="inv-td inv-td-r">{item.discount || 0}%</td>
-                <td className="inv-td inv-td-r">{item.gst || 0}%</td>
-                <td className="inv-td inv-td-r" style={{ fontWeight: 700, color: '#111' }}>{formatINR(c.total)}</td>
+                <td className="inv-td inv-td-r">{item.free ? '—' : formatINR(parseFloat(item.rate) || 0)}</td>
+                <td className="inv-td inv-td-r">{item.free ? '—' : (item.discount || 0) + '%'}</td>
+                <td className="inv-td inv-td-r">{item.free ? '—' : (item.gst || 0) + '%'}</td>
+                <td className="inv-td inv-td-r" style={{ fontWeight: 700, color: item.free ? '#10b981' : '#111' }}>
+                  {item.free ? 'FREE' : formatINR(c.total)}
+                </td>
               </tr>
             );
           })}
+
           {(invoice.items || []).length === 0 && (
             <tr>
               <td colSpan={8} className="inv-td"

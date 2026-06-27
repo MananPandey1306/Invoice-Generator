@@ -2,7 +2,8 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 
 export default function TemplateMono({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(invoice.items || []);
+  const paidItems = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
+  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
@@ -82,16 +83,17 @@ export default function TemplateMono({ biz, invoice, forPdf = false }) {
           </thead>
           <tbody>
             {(invoice.items || []).map((item, idx) => {
-              const c = calcItemAmount(item);
+              const effItem = item.free ? { ...item, rate: '0', discount: '0', gst: '0' } : item;
+              const c = calcItemAmount(effItem);
               return (
                 <tr key={item.id} className={idx % 2 === 1 ? 'tmono-tr-alt' : 'tmono-tr'}>
                   <td className="tmono-td">{item.name || ''}</td>
                   <td className="tmono-td tmono-r">{item.qty}</td>
                   <td className="tmono-td tmono-r">{item.unit}</td>
-                  <td className="tmono-td tmono-r">{formatINR(parseFloat(item.rate) || 0)}</td>
-                  <td className="tmono-td tmono-r">{item.discount || 0}%</td>
-                  <td className="tmono-td tmono-r">{item.gst || 0}%</td>
-                  <td className="tmono-td tmono-r tmono-bold">{formatINR(c.total)}</td>
+                  <td className="tmono-td tmono-r">{item.free ? '—' : formatINR(parseFloat(item.rate) || 0)}</td>
+                  <td className="tmono-td tmono-r">{item.free ? '—' : `${item.discount || 0}%`}</td>
+                  <td className="tmono-td tmono-r">{item.free ? '—' : `${item.gst || 0}%`}</td>
+                  <td className="tmono-td tmono-r tmono-bold" style={item.free ? { color: '#10b981' } : {}}>{item.free ? 'FREE' : formatINR(c.total)}</td>
                 </tr>
               );
             })}
