@@ -475,48 +475,48 @@ function ItemRow({ item, onChange, onDelete, idx }) {
   const set = (f, v) => onChange({ ...item, [f]: v });
   return (
     <tr>
-      <td style={{ color: '#94a3b8', fontWeight: 600, width: 30 }}>{idx + 1}</td>
-      <td style={{ minWidth: 140 }}>
+      <td style={{ color: '#94a3b8', fontWeight: 600, width: 28, textAlign: 'center' }}>{idx + 1}</td>
+      <td style={{ minWidth: 150 }}>
         <input id={`item-name-${item.id}`} placeholder="Item description"
-          value={item.name} onChange={e => set('name', e.target.value)} style={{ minWidth: 120 }} />
+          value={item.name} onChange={e => set('name', e.target.value)} style={{ minWidth: 130 }} />
       </td>
-      <td style={{ width: 65 }}>
+      <td style={{ width: 60 }}>
         <input id={`item-qty-${item.id}`} type="number" min="0" step="any"
           value={item.qty} onChange={e => set('qty', e.target.value)} />
       </td>
-      <td style={{ width: 80 }}>
+      <td style={{ width: 78 }}>
         <select id={`item-unit-${item.id}`} value={item.unit} onChange={e => set('unit', e.target.value)}>
           {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
         </select>
       </td>
-      <td style={{ width: 110 }}>
-        <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          <input id={`item-rate-${item.id}`} type="number" min="0" step="any" placeholder="0.00"
-            value={isFree ? '' : item.rate}
-            disabled={isFree}
-            onChange={e => set('rate', e.target.value)}
-            style={{ opacity: isFree ? 0.4 : 1, minWidth: 58 }} />
-          <button
-            id={`item-free-${item.id}`}
-            title="Mark as FREE"
-            onClick={() => set('free', !isFree)}
-            style={{
-              padding: '3px 6px', fontSize: 10, fontWeight: 800, borderRadius: 5, border: 'none',
-              cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '0.3px',
-              background: isFree ? '#10b981' : 'rgba(16,185,129,0.12)',
-              color: isFree ? '#fff' : '#10b981',
-              transition: 'all 0.18s',
-            }}
-          >FREE</button>
-        </div>
+      {/* Rate + FREE stacked */}
+      <td style={{ width: 120 }}>
+        <input id={`item-rate-${item.id}`} type="number" min="0" step="any" placeholder="0.00"
+          value={isFree ? '' : item.rate}
+          disabled={isFree}
+          onChange={e => set('rate', e.target.value)}
+          style={{ width: '100%', opacity: isFree ? 0.4 : 1 }} />
+        <button
+          id={`item-free-${item.id}`}
+          title="Mark as FREE"
+          onClick={() => set('free', !isFree)}
+          style={{
+            marginTop: 3, width: '100%',
+            padding: '2px 0', fontSize: 9.5, fontWeight: 800, borderRadius: 4, border: 'none',
+            cursor: 'pointer', letterSpacing: '0.5px',
+            background: isFree ? '#10b981' : 'rgba(16,185,129,0.12)',
+            color: isFree ? '#fff' : '#10b981',
+            transition: 'all 0.18s',
+          }}
+        >{isFree ? '✓ FREE' : 'FREE'}</button>
       </td>
-      <td style={{ width: 70 }}>
+      <td style={{ width: 66 }}>
         <input id={`item-disc-${item.id}`} type="number" min="0" max="100" step="any"
           value={item.discount} disabled={isFree}
           onChange={e => set('discount', e.target.value)}
           style={{ opacity: isFree ? 0.4 : 1 }} />
       </td>
-      <td style={{ width: 72 }}>
+      <td style={{ width: 70 }}>
         <select id={`item-gst-${item.id}`} value={item.gst} disabled={isFree}
           onChange={e => set('gst', e.target.value)}
           style={{ opacity: isFree ? 0.4 : 1 }}>
@@ -528,7 +528,7 @@ function ItemRow({ item, onChange, onDelete, idx }) {
           ? <span style={{ color: '#10b981', fontWeight: 800, fontSize: 11, letterSpacing: '0.5px' }}>FREE</span>
           : formatINR(c.total)}
       </td>
-      <td style={{ textAlign: 'center', width: 36 }}>
+      <td style={{ textAlign: 'center', width: 40 }}>
         <button id={`del-${item.id}`} className="delete-row-btn" onClick={onDelete} title="Remove"></button>
       </td>
     </tr>
