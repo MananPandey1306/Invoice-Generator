@@ -74,7 +74,7 @@ export function calcItemAmount(item) {
 
 //  Invoice Totals 
 
-export function calcTotals(items) {
+export function calcTotals(items, overallDiscountPct = 0) {
   let subtotal = 0, totalDisc = 0, totalGST = 0;
   items.forEach(item => {
     const c = calcItemAmount(item);
@@ -82,8 +82,10 @@ export function calcTotals(items) {
     totalDisc += c.discAmt;
     totalGST += c.gstAmt;
   });
-  const grand = subtotal - totalDisc + totalGST;
-  return { subtotal, totalDisc, totalGST, grand };
+  const baseTotal = subtotal - totalDisc + totalGST;
+  const overallDiscAmt = baseTotal * (parseFloat(overallDiscountPct) || 0) / 100;
+  const grand = baseTotal - overallDiscAmt;
+  return { subtotal, totalDisc, totalGST, grand, overallDiscAmt };
 }
 
 //  LocalStorage helpers 
@@ -137,6 +139,7 @@ export function defaultInvoice(num) {
     notes: 'Goods once sold will not be returned.',
     igstMode: false,
     isEstimate: false,
+    overallDiscount: '',
     items: [defaultItem()],
   };
 }

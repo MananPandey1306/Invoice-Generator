@@ -63,7 +63,7 @@ function cleanPhone(raw) {
 function buildWhatsAppMsg(biz, invoice) {
   const isEst = invoice.isEstimate;
   const label = isEst ? 'Estimate' : 'Invoice';
-  const { grand } = calcTotals(invoice.items || []);
+  const { grand } = calcTotals(invoice.items || [], invoice.overallDiscount);
   const itemLines = (invoice.items || [])
     .filter(i => i.name)
     .map((i, idx) => {
@@ -542,8 +542,9 @@ function ItemsPanel({ invoice, onChange }) {
   const del   = idx => onChange({ ...invoice, items: items.filter((_, i) => i !== idx) });
   const add   = () => onChange({ ...invoice, items: [...items, defaultItem()] });
   const clearAll = () => { if (window.confirm('Clear all items?')) onChange({ ...invoice, items: [] }); };
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(
-    items.map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i)
+  const { subtotal, totalDisc, totalGST, grand, overallDiscAmt } = calcTotals(
+    items.map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i),
+    invoice.overallDiscount
   );
   const half  = totalGST / 2;
   return (
@@ -598,6 +599,21 @@ function ItemsPanel({ invoice, onChange }) {
             <div className="totals-row"><span className="totals-label">CGST</span><span className="totals-val">{formatINR(half)}</span></div>
             <div className="totals-row"><span className="totals-label">SGST</span><span className="totals-val">{formatINR(half)}</span></div>
           </> : <div className="totals-row"><span className="totals-label">IGST</span><span className="totals-val">{formatINR(totalGST)}</span></div>}
+          <div className="totals-row">
+            <span className="totals-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Bill Discount (%)
+              <input
+                type="number"
+                style={{ width: '60px', padding: '2px 6px', border: '1px solid #e2e8f0', borderRadius: '4px', textAlign: 'right' }}
+                value={invoice.overallDiscount || ''}
+                onChange={e => onChange({ ...invoice, overallDiscount: e.target.value })}
+                placeholder="0"
+              />
+            </span>
+            <span className="totals-val" style={{ color: overallDiscAmt > 0 ? '#ef4444' : 'inherit' }}>
+              {overallDiscAmt > 0 ? `-${formatINR(overallDiscAmt)}` : '₹0.00'}
+            </span>
+          </div>
           <div className="totals-row grand"><span>Grand Total</span><span>{formatINR(grand)}</span></div>
         </div>
         <div className="amount-words">{amountToWords(grand)}</div>

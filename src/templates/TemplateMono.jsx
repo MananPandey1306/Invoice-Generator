@@ -3,7 +3,7 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 export default function TemplateMono({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
   const paidItems = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
+  const { subtotal, totalDisc, totalGST, grand, overallDiscAmt } = calcTotals(paidItems, invoice.overallDiscount);
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
@@ -134,6 +134,12 @@ export default function TemplateMono({ biz, invoice, forPdf = false }) {
               <tr className="tmono-subtotal-row">
                 <td colSpan={6} className="tmono-td tmono-r tmono-sub-label">IGST</td>
                 <td className="tmono-td tmono-r tmono-bold">{formatINR(totalGST)}</td>
+              </tr>
+            )}
+            {overallDiscAmt > 0 && (
+              <tr className="tmono-subtotal-row">
+                <td colSpan={6} className="tmono-td tmono-r tmono-sub-label" style={{ color: '#ef4444' }}>Total Discount ({invoice.overallDiscount}%)</td>
+                <td className="tmono-td tmono-r tmono-bold" style={{ color: '#ef4444' }}>-{formatINR(overallDiscAmt)}</td>
               </tr>
             )}
             <tr className="tmono-grand-row">

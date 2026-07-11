@@ -3,7 +3,7 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 export default function TemplateWave({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
   const paidItems = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
+  const { subtotal, totalDisc, totalGST, grand, overallDiscAmt } = calcTotals(paidItems, invoice.overallDiscount);
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
@@ -100,6 +100,12 @@ export default function TemplateWave({ biz, invoice, forPdf = false }) {
             <div className="tw-totals-row"><span>SGST</span><span>{formatINR(half)}</span></div>
           </>) : (
             <div className="tw-totals-row"><span>IGST</span><span>{formatINR(totalGST)}</span></div>
+          )}
+          {overallDiscAmt > 0 && (
+            <div className="tw-totals-row" style={{ color: '#ef4444' }}>
+              <span>Total Discount ({invoice.overallDiscount}%)</span>
+              <span>-{formatINR(overallDiscAmt)}</span>
+            </div>
           )}
           <div className="tw-totals-grand">
             <span>Total</span><span>{formatINR(grand)}</span>

@@ -3,7 +3,7 @@ import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
   const paidItems = (invoice.items || []).map(i => i.free ? { ...i, rate: '0', discount: '0', gst: '0' } : i);
-  const { subtotal, totalDisc, totalGST, grand } = calcTotals(paidItems);
+  const { subtotal, totalDisc, totalGST, grand, overallDiscAmt } = calcTotals(paidItems, invoice.overallDiscount);
   const half = totalGST / 2;
   const docTitle = isEstimate ? 'ESTIMATE' : 'INVOICE';
 
@@ -115,6 +115,12 @@ export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
               <tr className="tgeo-total-row">
                 <td colSpan={7} className="tgeo-td tgeo-r" style={{ fontWeight: 600 }}>IGST</td>
                 <td className="tgeo-td tgeo-r" style={{ fontWeight: 700 }}>{formatINR(totalGST)}</td>
+              </tr>
+            )}
+            {overallDiscAmt > 0 && (
+              <tr className="tgeo-total-row">
+                <td colSpan={7} className="tgeo-td tgeo-r" style={{ fontWeight: 600, color: '#e53e3e' }}>Total Discount ({invoice.overallDiscount}%)</td>
+                <td className="tgeo-td tgeo-r" style={{ fontWeight: 700, color: '#e53e3e' }}>-{formatINR(overallDiscAmt)}</td>
               </tr>
             )}
             <tr className="tgeo-grand-row">
