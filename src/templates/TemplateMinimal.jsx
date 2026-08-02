@@ -1,4 +1,5 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
+import UPIQRCode from '../UPIQRCode';
 
 export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -123,7 +124,10 @@ export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
             <div className="tmin-footer-block">
               <div className="tmin-footer-heading">Payment Information</div>
               <div className="tmin-footer-text">{invoice.paymentMode}</div>
-              {biz.gstin && <div className="tmin-footer-text">GSTIN: {biz.gstin}</div>}
+              {invoice.paymentMode === 'UPI' && biz.upiId && (
+                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+              )}
+              {biz.gstin && <div className="tmin-footer-text" style={{ marginTop: 6 }}>GSTIN: {biz.gstin}</div>}
             </div>
           )}
           {invoice.notes && (

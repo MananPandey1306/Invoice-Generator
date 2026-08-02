@@ -1,4 +1,5 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
+import UPIQRCode from '../UPIQRCode';
 
 export default function TemplateWave({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -117,7 +118,14 @@ export default function TemplateWave({ biz, invoice, forPdf = false }) {
 
       {/* Payment + Notes */}
       {invoice.paymentMode && (
-        <div className="tw-payment"><strong>Payment method:</strong>&nbsp; {invoice.paymentMode}</div>
+        <div className="tw-payment">
+          <strong>Payment method:</strong>&nbsp; {invoice.paymentMode}
+          {invoice.paymentMode === 'UPI' && biz.upiId && (
+            <div style={{ marginTop: 8 }}>
+              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+            </div>
+          )}
+        </div>
       )}
       {invoice.notes && (
         <div className="tw-note"><strong>Note:</strong>&nbsp; {invoice.notes}</div>

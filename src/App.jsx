@@ -372,6 +372,11 @@ function BusinessPanel({ biz, onChange }) {
           <input id="biz-gstin" placeholder="22AAAAA0000A1Z5" maxLength={15}
             value={biz.gstin} onChange={e => onChange({ ...biz, gstin: e.target.value.toUpperCase() })} />
         </div>
+        <div className="form-group span-2">
+          <label htmlFor="biz-upiId">UPI ID (optional)</label>
+          <input id="biz-upiId" placeholder="e.g. 9876543210@upi"
+            value={biz.upiId || ''} onChange={e => onChange({ ...biz, upiId: e.target.value })} />
+        </div>
       </div>
     </div>
   );

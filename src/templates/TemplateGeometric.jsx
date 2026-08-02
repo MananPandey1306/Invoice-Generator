@@ -1,4 +1,5 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
+import UPIQRCode from '../UPIQRCode';
 
 export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -141,6 +142,11 @@ export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
               <div className="tgeo-footer-label">Note:</div>
               <div className="tgeo-footer-text">{invoice.notes}</div>
             </>
+          )}
+          {invoice.paymentMode === 'UPI' && biz.upiId && (
+            <div style={{ marginTop: 8 }}>
+              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+            </div>
           )}
           {biz.gstin && <div className="tgeo-footer-text" style={{ marginTop: 6 }}>GSTIN: {biz.gstin}</div>}
         </div>

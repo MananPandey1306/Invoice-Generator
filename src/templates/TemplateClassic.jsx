@@ -1,4 +1,5 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
+import UPIQRCode from '../UPIQRCode';
 
 export default function TemplateClassic({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -173,6 +174,9 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
             <div>
               <div className="inv-footer-heading">Payment Method</div>
               <div className="inv-footer-text">{invoice.paymentMode}</div>
+              {invoice.paymentMode === 'UPI' && biz.upiId && (
+                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+              )}
             </div>
           )}
         </div>

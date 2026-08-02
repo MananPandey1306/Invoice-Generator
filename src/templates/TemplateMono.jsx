@@ -1,4 +1,5 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
+import UPIQRCode from '../UPIQRCode';
 
 export default function TemplateMono({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -157,6 +158,11 @@ export default function TemplateMono({ biz, invoice, forPdf = false }) {
         <div className="tmono-footer-left">
           <div className="tmono-footer-heading">Payment info:</div>
           {invoice.paymentMode && <div className="tmono-footer-item"><span className="tmono-fi-k">Method:</span> {invoice.paymentMode}</div>}
+          {invoice.paymentMode === 'UPI' && biz.upiId && (
+            <div className="tmono-footer-item">
+              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+            </div>
+          )}
           {biz.gstin   && <div className="tmono-footer-item"><span className="tmono-fi-k">GSTIN:</span> {biz.gstin}</div>}
           {biz.email   && <div className="tmono-footer-item"><span className="tmono-fi-k">Email:</span> {biz.email}</div>}
           {biz.phone   && <div className="tmono-footer-item"><span className="tmono-fi-k">Phone:</span> {biz.phone}</div>}

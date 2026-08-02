@@ -144,5 +144,5 @@ export function defaultInvoice(num) {
   };
 }
 export const defaultBiz = {
-  name: '', phone: '', email: '', address: '', gstin: '', logo: '', stampImg: '', signName: '',
+  name: '', phone: '', email: '', address: '', gstin: '', logo: '', stampImg: '', signName: '', upiId: '',
 };
