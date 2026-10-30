@@ -148,11 +148,6 @@ export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
               <div className="tgeo-footer-text">{invoice.notes}</div>
             </>
           )}
-          {invoice.paymentMode === 'UPI' && biz.upiId && (
-            <div style={{ marginTop: 8 }}>
-              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
-            </div>
-          )}
           {biz.gstin && <div className="tgeo-footer-text" style={{ marginTop: 6 }}>GSTIN: {biz.gstin}</div>}
         </div>
         <div className="tgeo-footer-right">

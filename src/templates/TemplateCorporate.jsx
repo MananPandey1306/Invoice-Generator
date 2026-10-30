@@ -143,11 +143,6 @@ export default function TemplateCorporate({ biz, invoice, forPdf = false }) {
           <div className="tcorp-footer-left">
             <div className="tcorp-footer-heading">Payment Information:</div>
             {invoice.paymentMode && <div className="tcorp-footer-item"><strong>Method:</strong> {invoice.paymentMode}</div>}
-            {invoice.paymentMode === 'UPI' && biz.upiId && (
-              <div className="tcorp-footer-item">
-                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
-              </div>
-            )}
             {biz.gstin && <div className="tcorp-footer-item"><strong>GSTIN:</strong> {biz.gstin}</div>}
             {biz.email && <div className="tcorp-footer-item"><strong>Email:</strong> {biz.email}</div>}
             {biz.phone && <div className="tcorp-footer-item"><strong>Phone:</strong> {biz.phone}</div>}

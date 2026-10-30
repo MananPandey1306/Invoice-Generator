@@ -125,11 +125,6 @@ export default function TemplateWave({ biz, invoice, forPdf = false }) {
       {invoice.paymentMode && (
         <div className="tw-payment">
           <strong>Payment method:</strong>&nbsp; {invoice.paymentMode}
-          {invoice.paymentMode === 'UPI' && biz.upiId && (
-            <div style={{ marginTop: 8 }}>
-              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
-            </div>
-          )}
         </div>
       )}
       {invoice.notes && (
