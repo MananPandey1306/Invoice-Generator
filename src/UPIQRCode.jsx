@@ -9,7 +9,6 @@ export default function UPIQRCode({ upiId, payeeName, amount }) {
   // am: Amount
   // cu: Currency (INR)
   const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName || 'Business')}&am=${encodeURIComponent(amount || 0)}&cu=INR`;
-  const amtFormatted = amount ? `\u20B9${parseFloat(amount).toFixed(2)}` : '';
 
   return (
     <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px' }}>
@@ -22,15 +21,6 @@ export default function UPIQRCode({ upiId, payeeName, amount }) {
       <div style={{ fontSize: '10px', color: '#475569' }}>
         {upiId}
       </div>
-      {/* Clickable Pay Now button — works in digital PDF viewers & browser; hidden on print */}
-      <a
-        href={upiUrl}
-        className="upi-pay-btn no-print"
-        title={`Pay ${amtFormatted} via UPI`}
-      >
-        <span className="upi-pay-btn-icon">&#8377;</span>
-        Pay Now via UPI{amtFormatted ? ` \u2014 ${amtFormatted}` : ''}
-      </a>
     </div>
   );
 }

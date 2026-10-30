@@ -1,5 +1,6 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 import UPIQRCode from '../UPIQRCode';
+import UPIPayButton from '../UPIPayButton';
 
 export default function TemplateCorporate({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -117,6 +118,11 @@ export default function TemplateCorporate({ biz, invoice, forPdf = false }) {
         </div>
 
         <div className="tcorp-words">{amountToWords(grand)}</div>
+
+        {/* UPI PAY BUTTON — below grand total */}
+        {biz.upiId && !isEstimate && (
+          <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+        )}
 
         {/* Note + Thank You */}
         <div className="tcorp-note-row">

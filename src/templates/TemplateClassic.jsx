@@ -1,5 +1,6 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
 import UPIQRCode from '../UPIQRCode';
+import UPIPayButton from '../UPIPayButton';
 
 export default function TemplateClassic({ biz, invoice, forPdf = false }) {
   const isEstimate = invoice.isEstimate || false;
@@ -155,6 +156,11 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
 
       {/* AMOUNT IN WORDS */}
       <div className="inv-amount-words">{amountToWords(grand)}</div>
+
+      {/* UPI PAY BUTTON — below grand total, visible on screen only */}
+      {biz.upiId && !isEstimate && (
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+      )}
 
       {/* THANK YOU */}
       <div className="inv-thankyou">
