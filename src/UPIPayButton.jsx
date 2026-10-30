@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
 /**
- * Clickable UPI Pay Now button.
- * - Always visible both on screen and inside generated PDF
- * - Inside PDF: jsPDF and print-to-pdf bind the clickable payUrl
- * - On mobile screen: opens upi:// direct app deep-link
- * - On desktop screen: opens a clean QR modal for quick scanning
+ * Clickable UPI Payment Card & Pay Now button.
+ * - Displays a scannable QR code alongside an attractive Pay Now button.
+ * - Always visible on screen, print, and inside generated PDF.
+ * - Inside PDF: jsPDF and print-to-pdf bind active hyperlinks over both button and QR.
+ * - On mobile screen: tapping directly triggers UPI intent (Google Pay, PhonePe, Paytm, etc.).
+ * - On desktop screen: click opens full QR modal for easy scanning.
  */
 export default function UPIPayButton({ upiId, payeeName, amount, invoiceNumber }) {
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +25,7 @@ export default function UPIPayButton({ upiId, payeeName, amount, invoiceNumber }
   // Direct UPI URI for mobile intents
   const upiDirectUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName || 'Business')}&am=${encodeURIComponent(amtNum > 0 ? amtNum.toFixed(2) : '')}&cu=INR${noteParam ? `&tn=${encodeURIComponent(noteParam)}` : ''}`;
 
-  // Universal web payment URL for PDFs (works on all mobile PDF viewers, WhatsApp, desktop, etc.)
+  // Universal web payment URL for PDFs
   const payUrl = `${origin}/pay.html?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName || 'Business')}&am=${encodeURIComponent(amtNum > 0 ? amtNum.toFixed(2) : '')}&tn=${encodeURIComponent(noteParam)}&cu=INR`;
 
   const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -42,18 +43,44 @@ export default function UPIPayButton({ upiId, payeeName, amount, invoiceNumber }
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px', marginBottom: '8px' }}>
-        <a
-          href={payUrl}
-          data-pay-btn="true"
-          data-pay-url={payUrl}
-          onClick={handleClick}
-          className="upi-pay-btn"
-          title={`Pay ${amtFormatted} via UPI`}
-        >
-          <span className="upi-pay-btn-icon">&#8377;</span>
-          Pay Now via UPI{amtFormatted ? ` — ${amtFormatted}` : ''}
-        </a>
+      <div className="upi-pay-section" data-pay-section="true">
+        <div className="upi-pay-card">
+          {/* Scannable QR Code */}
+          <div className="upi-qr-box" data-upi-qr="true" data-pay-url={payUrl}>
+            <a href={payUrl} target="_blank" rel="noreferrer" title="Scan with any UPI app or tap to pay">
+              <QRCodeSVG value={upiDirectUrl} size={74} level="M" />
+            </a>
+            <span className="upi-qr-label">Scan to Pay</span>
+          </div>
+
+          {/* Details + Attractive Pay Now Button */}
+          <div className="upi-details-col">
+            <div className="upi-meta-row">
+              <span className="upi-id-tag">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {upiId}
+              </span>
+              <span className="upi-apps-hint">GPay • PhonePe • Paytm</span>
+            </div>
+
+            <a
+              href={payUrl}
+              data-pay-btn="true"
+              data-pay-url={payUrl}
+              onClick={handleClick}
+              className="upi-pay-btn"
+              title={`Pay ${amtFormatted} via UPI`}
+            >
+              <span className="upi-pay-btn-icon">&#8377;</span>
+              <span>Pay Now via UPI</span>
+              {amtFormatted && <span className="upi-pay-btn-amt">{amtFormatted}</span>}
+              <svg className="upi-pay-btn-arrow" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Desktop QR Modal (hidden on print / PDF capture) */}

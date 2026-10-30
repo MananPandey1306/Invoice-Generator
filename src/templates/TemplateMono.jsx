@@ -1,5 +1,4 @@
 import { calcItemAmount, calcTotals, formatINR, amountToWords } from '../utils';
-import UPIQRCode from '../UPIQRCode';
 import UPIPayButton from '../UPIPayButton';
 
 export default function TemplateMono({ biz, invoice, forPdf = false }) {
