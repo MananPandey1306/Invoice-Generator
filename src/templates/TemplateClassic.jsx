@@ -159,7 +159,7 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total, visible on screen only */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
       )}
 
       {/* THANK YOU */}

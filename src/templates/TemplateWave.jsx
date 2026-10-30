@@ -119,7 +119,7 @@ export default function TemplateWave({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
       )}
 
       {/* Payment + Notes */}

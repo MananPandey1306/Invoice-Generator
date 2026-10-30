@@ -79,10 +79,6 @@ async function generatePDF(element, invoice) {
   const { default: html2canvas } = await import('html2canvas');
   const { jsPDF } = await import('jspdf');
 
-  // Hide .no-print elements before capture (html2canvas ignores @media print)
-  const noPrintEls = element.querySelectorAll('.no-print');
-  noPrintEls.forEach(el => { el.dataset._prevDisplay = el.style.display; el.style.display = 'none'; });
-
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
@@ -90,9 +86,6 @@ async function generatePDF(element, invoice) {
     logging: false,
     removeContainer: true,
   });
-
-  // Restore hidden elements after capture
-  noPrintEls.forEach(el => { el.style.display = el.dataset._prevDisplay || ''; delete el.dataset._prevDisplay; });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const A4_W = 210;  // mm

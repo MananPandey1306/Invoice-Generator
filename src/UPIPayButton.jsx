@@ -7,10 +7,11 @@ import { QRCodeSVG } from 'qrcode.react';
  * - On desktop: opens a modal with a scannable QR code
  * Hidden on print via the no-print class.
  */
-export default function UPIPayButton({ upiId, payeeName, amount }) {
+export default function UPIPayButton({ upiId, payeeName, amount, forPdf = false }) {
   const [showModal, setShowModal] = useState(false);
 
-  if (!upiId) return null;
+  // Never render in PDF/print capture
+  if (!upiId || forPdf) return null;
 
   const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName || 'Business')}&am=${encodeURIComponent(amount || 0)}&cu=INR`;
   const amtFormatted = amount ? `₹${parseFloat(amount).toFixed(2)}` : '';
