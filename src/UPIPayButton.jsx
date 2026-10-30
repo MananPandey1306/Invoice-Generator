@@ -18,12 +18,13 @@ export default function UPIPayButton({ upiId, payeeName, amount }) {
   const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
   const handleClick = (e) => {
-    e.preventDefault();
     if (isMobile) {
-      window.location.href = upiUrl;
-    } else {
-      setShowModal(true);
+      // Let the native anchor href="upi://..." do its job — don't prevent default
+      return;
     }
+    // Desktop: prevent navigation and show QR modal instead
+    e.preventDefault();
+    setShowModal(true);
   };
 
   return (
