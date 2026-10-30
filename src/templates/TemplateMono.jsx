@@ -156,7 +156,7 @@ export default function TemplateMono({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
       )}
 
       {/* Footer */}
@@ -166,7 +166,7 @@ export default function TemplateMono({ biz, invoice, forPdf = false }) {
           {invoice.paymentMode && <div className="tmono-footer-item"><span className="tmono-fi-k">Method:</span> {invoice.paymentMode}</div>}
           {invoice.paymentMode === 'UPI' && biz.upiId && (
             <div className="tmono-footer-item">
-              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
             </div>
           )}
           {biz.gstin   && <div className="tmono-footer-item"><span className="tmono-fi-k">GSTIN:</span> {biz.gstin}</div>}

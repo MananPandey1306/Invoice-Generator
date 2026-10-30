@@ -118,7 +118,7 @@ export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
       )}
 
       <hr className="tmin-hr" />
@@ -131,7 +131,7 @@ export default function TemplateMinimal({ biz, invoice, forPdf = false }) {
               <div className="tmin-footer-heading">Payment Information</div>
               <div className="tmin-footer-text">{invoice.paymentMode}</div>
               {invoice.paymentMode === 'UPI' && biz.upiId && (
-                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
               )}
               {biz.gstin && <div className="tmin-footer-text" style={{ marginTop: 6 }}>GSTIN: {biz.gstin}</div>}
             </div>

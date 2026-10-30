@@ -75,7 +75,7 @@ function buildWhatsAppMsg(biz, invoice) {
 }
 
 //  PDF generator using html2canvas + jsPDF 
-async function generatePDF(element, invoice) {
+async function generatePDF(element, invoice, biz = null) {
   const { default: html2canvas } = await import('html2canvas');
   const { jsPDF } = await import('jspdf');
 
@@ -130,6 +130,40 @@ async function generatePDF(element, invoice) {
     }
   }
 
+  // Add clickable PDF link annotations for payment button and payment QR code
+  try {
+    const elRect = element.getBoundingClientRect();
+    if (elRect && elRect.width > 0) {
+      const domScale = A4_W / elRect.width;
+      const clickableEls = element.querySelectorAll('[data-pay-btn], [data-upi-qr], .upi-pay-btn');
+      clickableEls.forEach((targetEl) => {
+        const payUrl = targetEl.getAttribute('data-pay-url') || targetEl.getAttribute('href');
+        if (!payUrl) return;
+
+        const targetRect = targetEl.getBoundingClientRect();
+        const xMm = (targetRect.left - elRect.left) * domScale;
+        const yMm = (targetRect.top - elRect.top) * domScale;
+        const wMm = targetRect.width * domScale;
+        const hMm = targetRect.height * domScale;
+
+        if (totalH <= A4_H) {
+          pdf.setPage(1);
+          pdf.link(xMm, yMm, wMm, hMm, { url: payUrl });
+        } else {
+          const pageIndex = Math.floor(yMm / A4_H);
+          const yOnPage = yMm - (pageIndex * A4_H);
+          const totalPages = typeof pdf.getNumberOfPages === 'function' ? pdf.getNumberOfPages() : 1;
+          if (pageIndex + 1 <= totalPages) {
+            pdf.setPage(pageIndex + 1);
+            pdf.link(xMm, yOnPage, wMm, hMm, { url: payUrl });
+          }
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Could not add clickable links to PDF', err);
+  }
+
   const label    = invoice.isEstimate ? 'Estimate' : 'Invoice';
   const filename = `${label}-${invoice.invoiceNumber}.pdf`;
   return { pdf, blob: pdf.output('blob'), filename };
@@ -153,7 +187,7 @@ function WhatsAppModal({ biz, invoice, pdfRef, onClose }) {
     setStep('generating');
     try {
       const el = pdfRef.current;
-      const { pdf, blob, filename } = await generatePDF(el, invoice);
+      const { pdf, blob, filename } = await generatePDF(el, invoice, biz);
       const file = new File([blob], filename, { type: 'application/pdf' });
 
       //  Mobile: Web Share API (can share file directly to WhatsApp app) 
@@ -705,7 +739,29 @@ function PaymentPanel({ invoice, onChange, biz, onBizChange }) {
 function PreviewModal({ biz, invoice, onClose, template }) {
   const invoiceRef  = useRef();
   const [showWA, setShowWA] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const isEst = invoice.isEstimate;
+
+  async function handleDownload() {
+    setDownloading(true);
+    try {
+      const el = invoiceRef.current;
+      const { blob, filename } = await generatePDF(el, invoice, biz);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error('Direct download failed, falling back to print', err);
+      window.print();
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   return (
     <>
@@ -730,8 +786,14 @@ function PreviewModal({ biz, invoice, onClose, template }) {
             {/* Print / Download PDF */}
             <button id="modal-pdf-btn"
               className={`btn btn-lg ${isEst ? 'btn-estimate' : 'btn-primary'}`}
+              disabled={downloading}
+              onClick={handleDownload}>
+              {downloading ? '⏳ Generating PDF...' : (isEst ? '⬇ Download Estimate' : '⬇ Download PDF')}
+            </button>
+
+            <button id="modal-print-btn" className="btn btn-secondary btn-lg"
               onClick={() => window.print()}>
-              {isEst ? ' Print Estimate' : ' Download PDF'}
+              🖨 Print
             </button>
 
             <button id="modal-close-btn" className="btn btn-secondary" onClick={onClose}>Close</button>

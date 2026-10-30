@@ -137,7 +137,7 @@ export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
       )}
 
       {/* Footer */}
@@ -151,7 +151,7 @@ export default function TemplateGeometric({ biz, invoice, forPdf = false }) {
           )}
           {invoice.paymentMode === 'UPI' && biz.upiId && (
             <div style={{ marginTop: 8 }}>
-              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+              <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
             </div>
           )}
           {biz.gstin && <div className="tgeo-footer-text" style={{ marginTop: 6 }}>GSTIN: {biz.gstin}</div>}

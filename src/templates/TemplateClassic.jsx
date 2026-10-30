@@ -159,7 +159,7 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
 
       {/* UPI PAY BUTTON — below grand total, visible on screen only */}
       {biz.upiId && !isEstimate && (
-        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} forPdf={forPdf} />
+        <UPIPayButton upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
       )}
 
       {/* THANK YOU */}
@@ -181,7 +181,7 @@ export default function TemplateClassic({ biz, invoice, forPdf = false }) {
               <div className="inv-footer-heading">Payment Method</div>
               <div className="inv-footer-text">{invoice.paymentMode}</div>
               {invoice.paymentMode === 'UPI' && biz.upiId && (
-                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} />
+                <UPIQRCode upiId={biz.upiId} payeeName={biz.name} amount={grand} invoiceNumber={invoice.invoiceNumber} />
               )}
             </div>
           )}

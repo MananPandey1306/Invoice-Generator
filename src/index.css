@@ -783,7 +783,7 @@ textarea { resize: vertical; min-height: 68px; }
 
   .no-print, .topbar, .editor-panel, .preview-panel,
   .bottom-actions, .modal-header, .modal-actions,
-  .modal-close, .save-toast, .wa-modal, .upi-pay-btn { display: none !important; }
+  .modal-close, .save-toast, .wa-modal { display: none !important; }
 
   .modal-overlay { position: static !important; background: none !important; padding: 0 !important; display: block !important; }
   .modal-box { max-width: 100% !important; max-height: none !important; box-shadow: none !important; background: white !important; border-radius: 0 !important; overflow: visible !important; }
